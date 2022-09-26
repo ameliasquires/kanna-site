@@ -1,5 +1,5 @@
 [{
-    "user":"root",
+    "name":"root",
     "pass":"password",
     "sudo":true,
     "last_login":"",

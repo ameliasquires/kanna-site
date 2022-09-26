@@ -3,10 +3,7 @@
     <title>
         worst website ever (real)
     </title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="/src/jsencrypt.min.js"></script>
-    <script src="/src/crypto.js"></script>
-    
+    <script src="/src/bundle.js"></script>
     <style>
         abbr {
   font-style: italic;
@@ -80,55 +77,51 @@ return(promise)
 }    
 let pub = ''
 function submit(){
+    //{body:{json:boolean,enc:boolean,data:string,sid:keyof keyring}}
     var xhr = new XMLHttpRequest();
+    xhr.open("POST", window.location.href + 'login/submit', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.onreadystatechange = function() {
     if (xhr.readyState == XMLHttpRequest.DONE) {
         alert(xhr.responseText);
+        }
     }
-}
-                    xhr.open("POST", window.location.href + 'login/submit', true);
-                    xhr.setRequestHeader('Content-Type', 'application/json');
-                    
-                    let user = document.getElementById("user").value
-                    let pass = document.getElementById("pass").value
-                    
-                    var singed = (JSON.stringify({'date':Date().toString(),'user':user,'pass':pass,sid:sid}))
-                    //console.log(singed,keys.publicKey)
-                    
-                    //console.log(JSON.stringify({'data':singed}))
-                    console.log("preview of request: "+JSON.stringify({enc:true,json:true,data:singed,sid:sid}))
-                    xhr.send(JSON.stringify({enc:true,json:true,data:singed,sid:sid}))
-                    }
-    function sendRequest(location,encrypt,key,request){
-        var xhr = new XMLHttpRequest();
-        var promise = new Promise((resolve, reject) => {
-    xhr.onreadystatechange = function() {
-    if (xhr.readyState == XMLHttpRequest.DONE) {
-        
-        resolve(xhr.responseText);
+    let user = document.getElementById('user').value
+    let pass = document.getElementById('pass').value
+    let out = {}
+    Object.assign(out,{json:true,enc:true,sid:sid},{data:nodersa(pub,'pkcs8-public').encrypt({user:user,pass:pass,date: new Date()},'base64')})
+
+    xhr.send(JSON.stringify(out))
     }
-}
-        })
+    function sendenc(location,content){
+    var xhr = new XMLHttpRequest();
     xhr.open("POST", window.location.href + location, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    
-    if(encrypt){     
-    let sign = new JSEncrypt()
-    sign.setPublicKey(key)       
-    var singed = sign.encrypt(JSON.stringify({'date':Date().toString()},request))
-    console.log("preview of request: "+JSON.stringify({enc:true,json:true,data:singed}))
-    xhr.send(JSON.stringify({enc:true,json:true,data:singed}))
-    } else {
-    var notsinged= JSON.stringify({'date':Date().toString()},request)
-    console.log("preview of request: "+JSON.stringify({enc:false,json:true,data:notsinged}))
-    xhr.send(JSON.stringify({enc:false,json:true,data:notsinged,sid:sid}))   
+    xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        pub=(xhr.responseText);
+        }
     }
-    return(promise)
+    let out = {}
+    Object.assign(out,{json:true,enc:false},{data:nodersa(pub,'pkcs8-public').encrypt(content,{date: new Date()},'base64')})
+    xhr.send(JSON.stringify(out))
     }
-
+    function sendnoenc(location,content){
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", window.location.href + location, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        pub=(xhr.responseText);
+        }
+    }
+    let out = {}
+    Object.assign(out,{json:true,enc:false},content)
+    xhr.send(JSON.stringify(out))
+    }
     async function load(){
-        console.log(CryptoJS.SHA512("Message"));
-        pub=await sendRequest('pub.key',false,'',{sid:sid})
+        sendnoenc('pub.key',{sid:sid})
+        
         //console.log(SubtleCrypto.encrypt('RSA-OAEP',SubtleCrypto.importKey('raw',pub,'RSA-OAEP',true)))
         readTextFile("kanna.txt").then((kanna)=>{
             let left = -300;
