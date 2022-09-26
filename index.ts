@@ -1,26 +1,21 @@
+import { readFileSync } from "fs"
+
 const express = require('express')
 const app = express()
-const port = 3000
+const port = 3001
 const fs = require('fs')
 const crypt = require("crypto")
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-const priv = `
-MIICXQIBAAKBgQClTC6XhWz6iDHivz/F5A1q+C0YdVeaHnd1wktRLgRO3UEzXPnb
-oniUqVgQfZ8QS6CNpwUjXEeolQmgnkqYNGYR/0DcEzrNWxCYiN4iLpKuVa0bGEiW
-o06CShpdgadgoN4FL+mOZybi7ccf2h8niyPfTO9L6PS1zCGrFD4JibeEfwIDAQAB
-AoGAQrPBQWeYGGkJKGTgiSyDtZy8JdiEJy8QKbbjybh2CJUEEIP+V4Dyg5rqbI0k
-uOCrwz2YtzIvwHmTzvrRQyYx4X5FZKH307QjFlKw+vNh4pskO6LRJlfp7K+gxLLM
-rI/mP4xWpVqVzOyvwQaYO135yQMxJ7AdaMRZ1feC/lv38wECQQDlr7/xgkwRDDog
-ijeIevBN5CUJVQeG+pm/YxojH18bTswN7Ctbur2HqMBwwcao7cycDcxzvkqMP+Ci
-2CzLzRc/AkEAuDwISy+Sz3qJ/U+zFN0epbK1cXfHKuJQ9K33lAeTlsNJwewtu+sT
-i0ielJ9lqeGYSUhjjCnEqEQyFZ8IwfWCwQJAdHmFaqFalaKPr4Sn2KwPRFCXf34B
-DS/z25wT2w/DmQOCcuT6r8+o4SxwOj3p0iyU/+X3chJjl2+lKK9bOBZO3QJBAJxe
-z8dI/Lm/TynCoMQfneiT0y8Ys+JxLrdOhSmOeLVo0cyXsoWiU/dPTtHkrLxQ7xmc
-KGoJ9ZHAOCZj0mIWCMECQQDQw81CWK6OWrNKVd3B/nSqQB7kn3J9S/L+hVkDuKw9
-5WAEevrUpd0m3GgKahWfH1XHyv4CIPMrksLfy3uV8ZBX
-`
+//let priv = '';
+
+
+interface keyring{
+  [sid: string]: string,
+ }
+let keyring = {} as keyring
+let key:any;
 function decryptMessage(encryptedMessage:any, privateKey:any) {
   const rsaPrivateKey = {
     key: privateKey,
@@ -36,34 +31,84 @@ function decryptMessage(encryptedMessage:any, privateKey:any) {
   return decryptedMessage.toString('utf8');
 }
 app.get('/', (req:any, res:any) => {
-  console.log("send")
-  res.sendFile(__dirname+"/index.html")
+  res.sendFile(__dirname+"/html/index.html")
 })
 app.get('/kanna.txt', (req:any, res:any) => {
   res.sendFile(__dirname+"/kanna.txt")
 })
-app.get('/jsencrypt.min.js', (req:any, res:any) => {
-  res.sendFile(__dirname+'/jsencrypt.min.js')
+app.get('/src/jsencrypt.min.js', (req:any, res:any) => {
+  res.sendFile(__dirname+'/src/jsencrypt.min.js')
 })
-app.get('/lights-out.gif', (req:any, res:any) => {
-  res.sendFile(__dirname+'/lights-out.gif')
+app.get('/src/crypto.js', (req:any, res:any) => {
+  res.sendFile(__dirname+'/src/crypto.js')
 })
-app.post('/login/submit', async (req:any, res:any) => {
-  console.log(req.body)
-  if(req.body.enc,req.body.json){
-  let request = await decryptMessage(req.body.data, crypt.createPrivateKey({
-            key: Buffer.from(priv, 'base64'),
-            format: "der",
-            type: 'pkcs1',
-          }))
-          request=JSON.parse(request)
-          console.log(request.user,request.pass)
-          //if(request.date==null){return}
-    if(request.user.trim() == "root" && request.pass.trim() == "password"){
-      console.log("hello:)")
-      res.sendFile(__dirname+"/index.html")
-    }
+app.get('/src/lights-out.gif', (req:any, res:any) => {
+  res.sendFile(__dirname+'/src/lights-out.gif')
+})
+app.post('/pub.key', async (req:{body:{json:boolean,sid:keyof keyring}}, res:any) => {
+  if(req.body.json){
+    const { publicKey, privateKey } = crypt.generateKeyPairSync("rsa", {
+      // The standard secure default length for RSA keys is 2048 bits
+      modulusLength: 1024,
+      publicKeyEncoding: {
+        type: 'pkcs1',
+        format: 'pem'
+      },
+      privateKeyEncoding: {
+        type: 'pkcs8',
+        format: 'pem',
+      }
+    })
+    res.send(publicKey.toString("base64"))
+    console.log(publicKey,privateKey)
+    
+    
   }
+})
+
+app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string,sid:keyof keyring}}, res:any) => {
+  //console.log(req.body)
+  //console.log(keyring,req.body.sid)
+  
+  if(req.body.enc,req.body.json){
+    try{
+      console.log(key)
+      // @ts-ignore
+      /*
+  let request = await decryptMessage(req.body.data, crypt.createPrivateKey({
+            key: Buffer.from(key, 'base64'),
+            padding:crypt.constants.RSA_PKCS1_PADDING,
+          }))*/
+          console.log(req.body)
+          const decryptedData = crypt.privateDecrypt(
+            {
+              key: key,
+              // In order to decrypt the data, we need to specify the
+              // same hashing function and padding scheme that we used to
+              // encrypt the data in the previous step
+              padding: crypt.constants.RSA_PKCS1_OAEP_PADDING,
+              oaepHash: "sha256",
+            },
+            req.body.data
+          )
+          //console.log(req.body)
+          let request=JSON.parse(decryptedData)
+          console.log(request)
+          //console.log(request.user,request.pass)
+          //if(request.date==null){return}
+    let user:any=readFileSync("json/user.json")
+    //console.log(user)
+    for(let i of JSON.parse(user)){
+      //console.log(i)
+    if(request.user.trim() == i['user'] && request.pass.trim() == i['pass']){
+      res.send("logged in")
+    }
+    
+  }}catch(err){
+    console.log(err)
+    
+  }
+}
   
 })
 app.listen(port,'0.0.0.0', () => {

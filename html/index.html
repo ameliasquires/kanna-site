@@ -4,7 +4,9 @@
         worst website ever (real)
     </title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="jsencrypt.min.js"></script>
+    <script src="/src/jsencrypt.min.js"></script>
+    <script src="/src/crypto.js"></script>
+    
     <style>
         abbr {
   font-style: italic;
@@ -28,19 +30,30 @@ abbr:hover::after {
 <body onload="load()" style="height: 100%; overflow: hidden;">
 <div id="kanna" onclick="lightsout()"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
     <script>
+        const sid=makeid(20)
+        window.sid=sid
+            function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
+}
+
+
         function lightsout(){
             document.body.innerHTML=""
             document.body.style.backgroundColor="black"
             document.title = "DONT TOUCH KANNA"
-            document.body.innerHTML='<img style="display:block;"src="lights-out.gif" id="gif"  width=100% height=100%/>'
             setTimeout(()=>{
-                document.getElementById("gif").src = "";
-                document.getElementById("gif").src = "lights-out.gif";
-                
+                document.body.innerHTML='<img style="display:block;"src="src/lights-out.gif" id="gif"  width=100% height=100%/>'
                 setTimeout(()=>{
                 document.body.innerHTML=''
                 
-            },10)
+            },500)
 
             },700)
         }
@@ -64,26 +77,59 @@ abbr:hover::after {
     rawFile.send(null);
 });
 return(promise)
-}    function submit(){
+}    
+let pub = ''
+function submit(){
     var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        alert(xhr.responseText);
+    }
+}
                     xhr.open("POST", window.location.href + 'login/submit', true);
                     xhr.setRequestHeader('Content-Type', 'application/json');
-                    let sign = new JSEncrypt()
-                    sign.setPublicKey(`-----BEGIN PUBLIC KEY-----
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQClTC6XhWz6iDHivz/F5A1q+C0Y
-dVeaHnd1wktRLgRO3UEzXPnboniUqVgQfZ8QS6CNpwUjXEeolQmgnkqYNGYR/0Dc
-EzrNWxCYiN4iLpKuVa0bGEiWo06CShpdgadgoN4FL+mOZybi7ccf2h8niyPfTO9L
-6PS1zCGrFD4JibeEfwIDAQAB
------END PUBLIC KEY-----`)
-                    var singed = sign.encrypt(JSON.stringify({'date':new Date(),'user':document.getElementById("user").value,'pass':document.getElementById("pass").value}))
+                    
+                    let user = document.getElementById("user").value
+                    let pass = document.getElementById("pass").value
+                    
+                    var singed = (JSON.stringify({'date':Date().toString(),'user':user,'pass':pass,sid:sid}))
                     //console.log(singed,keys.publicKey)
+                    
                     //console.log(JSON.stringify({'data':singed}))
-                    xhr.send(JSON.stringify({'data':singed,enc:true,json:true}))
-                    $.get(window.location.href, function(responseText) {
-                        document.body.innerHTML=(responseText);
-                    });
+                    console.log("preview of request: "+JSON.stringify({enc:true,json:true,data:singed,sid:sid}))
+                    xhr.send(JSON.stringify({enc:true,json:true,data:singed,sid:sid}))
                     }
-    function load(){
+    function sendRequest(location,encrypt,key,request){
+        var xhr = new XMLHttpRequest();
+        var promise = new Promise((resolve, reject) => {
+    xhr.onreadystatechange = function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+        
+        resolve(xhr.responseText);
+    }
+}
+        })
+    xhr.open("POST", window.location.href + location, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    
+    if(encrypt){     
+    let sign = new JSEncrypt()
+    sign.setPublicKey(key)       
+    var singed = sign.encrypt(JSON.stringify({'date':Date().toString()},request))
+    console.log("preview of request: "+JSON.stringify({enc:true,json:true,data:singed}))
+    xhr.send(JSON.stringify({enc:true,json:true,data:singed}))
+    } else {
+    var notsinged= JSON.stringify({'date':Date().toString()},request)
+    console.log("preview of request: "+JSON.stringify({enc:false,json:true,data:notsinged}))
+    xhr.send(JSON.stringify({enc:false,json:true,data:notsinged,sid:sid}))   
+    }
+    return(promise)
+    }
+
+    async function load(){
+        console.log(CryptoJS.SHA512("Message"));
+        pub=await sendRequest('pub.key',false,'',{sid:sid})
+        //console.log(SubtleCrypto.encrypt('RSA-OAEP',SubtleCrypto.importKey('raw',pub,'RSA-OAEP',true)))
         readTextFile("kanna.txt").then((kanna)=>{
             let left = -300;
             let top = -40;
