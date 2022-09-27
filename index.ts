@@ -2,7 +2,7 @@ import { readFileSync } from "fs"
 
 const express = require('express')
 const app = express()
-const port = 3001
+const port = 8008
 const fs = require('fs')
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -27,6 +27,9 @@ app.get('/src/bundle.js', (req:any, res:any) => {
 })
 app.get('/src/lights-out.gif', (req:any, res:any) => {
   res.sendFile(__dirname+'/src/lights-out.gif')
+})
+app.get('/src/kanna.gif', (req:any, res:any) => {
+  res.sendFile(__dirname+'/src/kanna.gif')
 })
 app.post('/pub.key', async (req:{body:{json:boolean,sid:keyof keyring}}, res:any) => {
   if(req.body.json){

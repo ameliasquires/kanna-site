@@ -3,7 +3,9 @@
     <title>
         worst website ever (real)
     </title>
+    <link rel="icon" href="/src/kanna.gif" type="image/gif" />
     <script src="/src/bundle.js"></script>
+    
     <style>
         abbr {
   font-style: italic;
@@ -22,11 +24,36 @@ abbr:hover::after {
   width: 280px;
   z-index: 1;
 }
+
+input{
+    background-color: rgba(200,200,200,.5);
+    backdrop-filter: blur(5px);
+    border-radius: 5px;
+    border:none;
+}
     </style>
 </head>
 <body onload="load()" style="height: 100%; overflow: hidden;">
 <div id="kanna" onclick="lightsout()"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
     <script>
+        color1 = 50
+        color2 = 50
+        color3 = 50
+        let si = setInterval(()=>{
+            color1+=1
+            document.body.style.backgroundImage="linear-gradient(to bottom right,rgba(255,0,0,.5), rgba(255,255,255,1),rgba(255,255,255,1),rgba("+color1+","+color2+","+color3+",.5))"
+            if(color1>=255){
+                color1=0
+                color2+=1
+                if(color2>=255){
+                    color2=0
+                    color3+=1
+                    if(color3>=255){
+                        color3=0
+                    }
+                }
+            }
+        },50)
         const sid=makeid(20)
         window.sid=sid
             function makeid(length) {
@@ -42,6 +69,8 @@ abbr:hover::after {
 
 
         function lightsout(){
+            clearInterval(si)
+            document.body.style.backgroundImage=''
             document.body.innerHTML=""
             document.body.style.backgroundColor="black"
             document.title = "DONT TOUCH KANNA"
@@ -119,10 +148,14 @@ function submit(){
     Object.assign(out,{json:true,enc:false},content)
     xhr.send(JSON.stringify(out))
     }
+    document.onkeypress = function (key) {
+    key = key || window.event;
+    if(key.key=="Enter"){
+        submit()
+    }
+    };
     async function load(){
         sendnoenc('pub.key',{sid:sid})
-        
-        //console.log(SubtleCrypto.encrypt('RSA-OAEP',SubtleCrypto.importKey('raw',pub,'RSA-OAEP',true)))
         readTextFile("kanna.txt").then((kanna)=>{
             let left = -300;
             let top = -40;
@@ -132,8 +165,8 @@ function submit(){
                 if (left>=600){
                     clearInterval(t)
                     setTimeout(()=>{
-                        document.body.innerHTML+="<tt><div style='position:absolute;bottom:20px;left:50px;font-weight:100;'>login w/ {user:<input placeholder='root' type='text' id='user' name='user'>,pass:<input type='text' id='pass' name='pass'>}</br><sub>will be <abbr title='so that the \"network administrators\"/\"IT people\" cant get in >:) '>encrypted</abbr> dont worry:)<input style='background-color:rgba(80,80,80,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:5px;' type='button' value='submit' onclick='submit()'></sub></div></tt>"
-                        document.body.innerHTML+="<div style='position:absolute;bottom:20px;right:50px;user-select: none;cursor:pointer;' onclick=\"location.href='mailto:grantsquires@disroot.org';\"><tt>need a account? contact grantsquires@disroot.org</tt></div>"
+                        document.body.innerHTML+="<tt><div style='position:absolute;bottom:20px;left:50px;font-weight:100;'>login w/ {user:<input placeholder='root' type='text' id='user' name='user'>,pass:<input type='password' id='pass' name='pass'>}</br><sub>will be <abbr title='so that the \"network administrators\"/\"IT people\" cant get in >:) '>encrypted</abbr> dont worry:)<input style='background-color:rgba(80,80,80,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:5px;' type='button' value='submit' onclick='submit()'></sub></div></tt>"
+                        document.body.innerHTML+="<div style='position:absolute;bottom:20px;right:50px;user-select: none;cursor:pointer;' onclick=\"location.href='mailto:grantsquires@disroot.org';\"><tt>need a account? contact grantsquires@disroot.org<sub><sub>(click here)</sub></sub></tt></div>"
                     },50)
                     
                    
