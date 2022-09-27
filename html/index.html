@@ -31,29 +31,15 @@ input{
     border-radius: 5px;
     border:none;
 }
+body{
+    background-image:linear-gradient(to bottom right,rgba(255,0,0,.5), rgba(255,255,255,1),rgba(255,255,255,1),rgba(255,0,0,.5))
+}
     </style>
 </head>
 <body onload="load()" style="height: 100%; overflow: hidden;">
 <div id="kanna" onclick="lightsout()"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
     <script>
-        color1 = 50
-        color2 = 50
-        color3 = 50
-        let si = setInterval(()=>{
-            color1+=1
-            document.body.style.backgroundImage="linear-gradient(to bottom right,rgba(255,0,0,.5), rgba(255,255,255,1),rgba(255,255,255,1),rgba("+color1+","+color2+","+color3+",.5))"
-            if(color1>=255){
-                color1=0
-                color2+=1
-                if(color2>=255){
-                    color2=0
-                    color3+=1
-                    if(color3>=255){
-                        color3=0
-                    }
-                }
-            }
-        },50)
+        
         const sid=makeid(20)
         window.sid=sid
             function makeid(length) {
@@ -69,7 +55,6 @@ input{
 
 
         function lightsout(){
-            clearInterval(si)
             document.body.style.backgroundImage=''
             document.body.innerHTML=""
             document.body.style.backgroundColor="black"
