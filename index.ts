@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 const NodeRSA = require('node-rsa');
+var ip = require("ip")
 //let priv = '';
 
 interface keyring{
@@ -59,5 +60,5 @@ app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string
   
 
 app.listen(port,'0.0.0.0', () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`kanna is on http://${ip.address()}:${port} click on me click on me! :3`)
 })

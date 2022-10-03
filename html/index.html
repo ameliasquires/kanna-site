@@ -1,167 +1,177 @@
 <html>
-<head >
+
+<head>
     <title>
         worst website ever (real)
     </title>
     <link rel="icon" href="/src/kanna.gif" type="image/gif" />
     <script src="/src/bundle.js"></script>
-    
+
     <style>
         abbr {
-  font-style: italic;
-  position: relative
-}
+            font-style: italic;
+            position: relative
+        }
 
-abbr:hover::after {
-  background: #add8e6;
-  border-radius: 4px;
-  bottom: 100%;
-  content: attr(title);
-  display: block;
-  left: 100%;
-  padding: 1em;
-  position: absolute;    
-  width: 280px;
-  z-index: 1;
-}
+        abbr:hover::after {
+            background: #add8e6;
+            border-radius: 4px;
+            bottom: 100%;
+            content: attr(title);
+            display: block;
+            left: 100%;
+            padding: 1em;
+            position: absolute;
+            width: 280px;
+            z-index: 1;
+        }
 
-input{
-    background-color: rgba(200,200,200,.5);
-    backdrop-filter: blur(5px);
-    border-radius: 5px;
-    border:none;
-}
-body{
-    background-image:linear-gradient(to bottom right,rgba(255,0,0,.5), rgba(255,255,255,1),rgba(255,255,255,1),rgba(255,0,0,.5))
-}
+        input {
+            background-color: rgba(200, 200, 200, .5);
+            backdrop-filter: blur(5px);
+            border-radius: 5px;
+            border: none;
+        }
+
+        body {
+            background-image: linear-gradient(to bottom right, rgba(255, 0, 0, .5), rgba(255, 255, 255, 1), rgba(255, 255, 255, 1), rgba(255, 0, 0, .5))
+        }
     </style>
 </head>
+
 <body onload="load()" style="height: 100%; overflow: hidden;">
-<div id="kanna" onclick="lightsout()"autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>
+    <div id="kanna" onclick="lightsout()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </div>
     <script>
-        
-        const sid=makeid(20)
-        window.sid=sid
-            function makeid(length) {
-    var result           = '';
-    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    var charactersLength = characters.length;
-    for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * 
- charactersLength));
-   }
-   return result;
-}
 
-
-        function lightsout(){
-            document.body.style.backgroundImage=''
-            document.body.innerHTML=""
-            document.body.style.backgroundColor="black"
-            document.title = "DONT TOUCH KANNA"
-            setTimeout(()=>{
-                document.body.innerHTML='<img style="display:block;"src="src/lights-out.gif" id="gif"  width=100% height=100%/>'
-                setTimeout(()=>{
-                document.body.innerHTML=''
-                
-            },500)
-
-            },700)
-        }
-     function readTextFile(file)
-{
-    var promise = new Promise((resolve, reject) => {
-    var rawFile = new XMLHttpRequest();
-    rawFile.open("GET", file, false);
-    rawFile.onreadystatechange = function ()
-    {
-        if(rawFile.readyState === 4)
-        {
-            if(rawFile.status === 200 || rawFile.status == 0)
-            {
-                var allText = rawFile.responseText; 
-                    resolve(allText)
-                
+        const sid = makeid(20)
+        window.sid = sid
+        function makeid(length) {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() *
+                    charactersLength));
             }
+            return result;
         }
-    }
-    rawFile.send(null);
-});
-return(promise)
-}    
-let pub = ''
-function submit(){
-    //{body:{json:boolean,enc:boolean,data:string,sid:keyof keyring}}
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", window.location.href + 'login/submit', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function() {
-    if (xhr.readyState == XMLHttpRequest.DONE) {
-        alert(xhr.responseText);
-        }
-    }
-    let user = document.getElementById('user').value
-    let pass = document.getElementById('pass').value
-    let out = {}
-    Object.assign(out,{json:true,enc:true,sid:sid},{data:nodersa(pub,'pkcs8-public').encrypt({user:user,pass:pass,date: new Date()},'base64')})
 
-    xhr.send(JSON.stringify(out))
-    }
-    function sendenc(location,content){
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", window.location.href + location, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function() {
-    if (xhr.readyState == XMLHttpRequest.DONE) {
-        pub=(xhr.responseText);
+
+        function lightsout() {
+            document.body.style.backgroundImage = ''
+            document.body.innerHTML = ""
+            document.body.style.backgroundColor = "black"
+            document.title = "DONT TOUCH KANNA"
+            setTimeout(() => {
+                document.body.innerHTML = '<img style="display:block;"src="src/lights-out.gif" id="gif"  width=100% height=100%/>'
+                setTimeout(() => {
+                    document.body.innerHTML = ''
+
+                }, 500)
+
+            }, 700)
         }
-    }
-    let out = {}
-    Object.assign(out,{json:true,enc:false},{data:nodersa(pub,'pkcs8-public').encrypt(content,{date: new Date()},'base64')})
-    xhr.send(JSON.stringify(out))
-    }
-    function sendnoenc(location,content){
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", window.location.href + location, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onreadystatechange = function() {
-    if (xhr.readyState == XMLHttpRequest.DONE) {
-        pub=(xhr.responseText);
-        }
-    }
-    let out = {}
-    Object.assign(out,{json:true,enc:false},content)
-    xhr.send(JSON.stringify(out))
-    }
-    document.onkeypress = function (key) {
-    key = key || window.event;
-    if(key.key=="Enter"){
-        submit()
-    }
-    };
-    async function load(){
-        sendnoenc('pub.key',{sid:sid})
-        readTextFile("kanna.txt").then((kanna)=>{
-            let left = -300;
-            let top = -40;
-            let t = setInterval(()=>{
-                document.getElementById("kanna").innerHTML+="<div style='user-select: none;white-space: nowrap; position:absolute;left:"+left+"px;top:"+top+"%;transform:scale(.5)'><tt><b>"+(kanna.replaceAll("#","</br>").replaceAll(" ","<font style='color:rgba(1,1,1,0)'>_</font>"))+"</b></div></tt></a>"
-                left+=300
-                if (left>=600){
-                    clearInterval(t)
-                    setTimeout(()=>{
-                        document.body.innerHTML+="<tt><div style='position:absolute;bottom:20px;left:50px;font-weight:100;'>login w/ {user:<input placeholder='root' type='text' id='user' name='user'>,pass:<input type='password' id='pass' name='pass'>}</br><sub>will be <abbr title='so that the \"network administrators\"/\"IT people\" cant get in >:) '>encrypted</abbr> dont worry:)<input style='background-color:rgba(80,80,80,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:5px;' type='button' value='submit' onclick='submit()'></sub></div></tt>"
-                        document.body.innerHTML+="<div style='position:absolute;bottom:20px;right:50px;user-select: none;cursor:pointer;' onclick=\"location.href='mailto:grantsquires@disroot.org';\"><tt>need a account? contact grantsquires@disroot.org<sub><sub>(click here)</sub></sub></tt></div>"
-                    },50)
-                    
-                   
-                    
+        function readTextFile(file) {
+            var promise = new Promise((resolve, reject) => {
+                var rawFile = new XMLHttpRequest();
+                rawFile.open("GET", file, false);
+                rawFile.onreadystatechange = function () {
+                    if (rawFile.readyState === 4) {
+                        if (rawFile.status === 200 || rawFile.status == 0) {
+                            var allText = rawFile.responseText;
+                            resolve(allText)
+
+                        }
+                    }
                 }
-            },80)
-            
-        })
-    }
+                rawFile.send(null);
+            });
+            return (promise)
+        }
+        let pub = ''
+        function submit() {
+            //{body:{json:boolean,enc:boolean,data:string,sid:keyof keyring}}
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", window.location.href + 'login/submit', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    alert(xhr.responseText);
+                }
+            }
+            let user = document.getElementById('user').value
+            let pass = document.getElementById('pass').value
+            let out = {}
+            Object.assign(out, { json: true, enc: true, sid: sid }, { data: nodersa(pub, 'pkcs8-public').encrypt({ user: user, pass: pass, date: new Date() }, 'base64') })
+
+            xhr.send(JSON.stringify(out))
+        }
+        function sendenc(location, content) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", window.location.href + location, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    pub = (xhr.responseText);
+                }
+            }
+            let out = {}
+            Object.assign(out, { json: true, enc: false }, { data: nodersa(pub, 'pkcs8-public').encrypt(content, { date: new Date() }, 'base64') })
+            xhr.send(JSON.stringify(out))
+        }
+        function sendnoenc(location, content) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", window.location.href + location, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    pub = (xhr.responseText);
+                }
+            }
+            let out = {}
+            Object.assign(out, { json: true, enc: false }, content)
+            xhr.send(JSON.stringify(out))
+        }
+        document.onkeypress = function (key) {
+            key = key || window.event;
+            if (key.key == "Enter") {
+                submit()
+            }
+        };
+        async function load() {
+            sendnoenc('pub.key', { sid: sid })
+            readTextFile("kanna.txt").then((kanna) => {
+                let left = -300;
+                let top = -40;
+                let t = setInterval(() => {
+                    document.getElementById("kanna").innerHTML += "<div style='user-select: none;white-space: nowrap; position:absolute;left:" + left + "px;top:" + top + "%;transform:scale(.5)'><tt><b>" + (kanna.replaceAll("#", "</br>").replaceAll(" ", "<font style='color:rgba(1,1,1,0)'>_</font>")) + "</b></div></tt></a>"
+                    left += 300
+                    if (left >= 600) {
+                        clearInterval(t)
+                        setTimeout(() => {
+                            /*
+                            document.body.innerHTML += "<tt><div style='position:absolute;bottom:20px;left:50px;font-weight:100;'>login w/ {user:<input placeholder='root' type='text' id='user' name='user'>,pass:<input type='password' id='pass' name='pass'>}</br><sub>will be <abbr title='so that the \"network administrators\"/\"IT people\" cant get in >:) '>encrypted</abbr> dont worry:)<input style='background-color:rgba(80,80,80,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:5px;' type='button' value='submit' onclick='submit()'></sub></div></tt>"
+                            document.body.innerHTML += "<div style='position:absolute;bottom:20px;right:50px;user-select: none;cursor:pointer;' onclick=\"location.href='mailto:grantsquires@disroot.org';\"><tt>need a account? contact grantsquires@disroot.org<sub><sub>(click here)</sub></sub></tt></div>"
+                            */
+                            deg = 10
+                            document.body.innerHTML += "<div id='pan' style='position:absolute;bottom:0px;right:0px;width:600px;height:100px;background-color:rgba(150,150,150,0.3);box-shadow: 0px 0px 20px 12px rgba(0,0,0,0.5);backdrop-filter:hue-rotate(10deg) blur(5px);border-radius:10px 0px 0px 0px;'></div>"
+                            setInterval(() => {
+                                deg += 10
+
+                                document.getElementById('pan').style.backdropFilter = "hue-rotate(" + deg + "deg) blur(5px)"
+                            }, 500)
+                        }, 50)
+
+
+
+                    }
+                }, 80)
+
+            })
+        }
     </script>
 </body>
 </tt>
+
 </html>
