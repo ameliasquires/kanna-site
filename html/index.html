@@ -103,7 +103,10 @@
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    alert(xhr.responseText);
+                    let dec = (kekw.decrypt(JSON.parse(xhr.responseText).data));
+                    if (JSON.parse(xhr.responseText).html) {
+                        document.body.innerHTML = dec
+                    }
                 }
             }
             let user = document.getElementById('user').value
@@ -120,7 +123,8 @@
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.onreadystatechange = function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
-                    pub = (xhr.responseText);
+                    pub = kekw.decrypt(JSON.parse(xhr.responseText).data);
+                    return pub
                 }
             }
             let out = {}
@@ -146,9 +150,10 @@
                 submit()
             }
         };
+        let kekw
         let mypriv, mypub
         async function load() {
-            let kekw = await nodersa({ b: 512 })
+            kekw = await nodersa({ b: 512 })
             mypriv = await kekw.exportKey('pkcs1-private')
             mypub = await kekw.exportKey('pkcs8-public')
             console.log(mypub)

@@ -1,6 +1,7 @@
 # kanna
 
 security project to learn client and server encryption
+create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./selfsigned.key -out selfsigned.crt`
 
 run `npm i` & `npm start`
 
