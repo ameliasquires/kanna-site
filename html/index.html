@@ -13,6 +13,12 @@
             position: relative
         }
 
+        @media only screen and (max-width: 760px) {
+            .pan {
+                display: none;
+            }
+        }
+
         abbr:hover::after {
             background: #add8e6;
             border-radius: 4px;
@@ -103,6 +109,7 @@
             let user = document.getElementById('user').value
             let pass = document.getElementById('pass').value
             let out = {}
+
             Object.assign(out, { json: true, enc: true, sid: sid }, { data: nodersa(pub, 'pkcs8-public').encrypt({ user: user, pass: pass, date: new Date() }, 'base64') })
 
             xhr.send(JSON.stringify(out))
@@ -139,8 +146,13 @@
                 submit()
             }
         };
+        let mypriv, mypub
         async function load() {
-            sendnoenc('pub.key', { sid: sid })
+            let kekw = await nodersa({ b: 512 })
+            mypriv = await kekw.exportKey('pkcs1-private')
+            mypub = await kekw.exportKey('pkcs8-public')
+            console.log(mypub)
+            sendnoenc('pub.key', { sid: sid, pub: mypub })
             readTextFile("kanna.txt").then((kanna) => {
                 let left = -300;
                 let top = -40;
@@ -155,7 +167,9 @@
                             document.body.innerHTML += "<div style='position:absolute;bottom:20px;right:50px;user-select: none;cursor:pointer;' onclick=\"location.href='mailto:grantsquires@disroot.org';\"><tt>need a account? contact grantsquires@disroot.org<sub><sub>(click here)</sub></sub></tt></div>"
                             */
                             deg = 10
-                            document.body.innerHTML += "<div id='pan' style='position:absolute;bottom:0px;right:0px;width:600px;height:100px;background-color:rgba(150,150,150,0.3);box-shadow: 0px 0px 20px 12px rgba(0,0,0,0.5);backdrop-filter:hue-rotate(10deg) blur(5px);border-radius:10px 0px 0px 0px;'></div>"
+                            document.body.innerHTML += "<div id='pan' style='display: flex;flex-direction: column;position:absolute;bottom:0px;right:0px;width:45%;height:100px;background-color:rgba(150,150,150,0.3);box-shadow: 0px 0px 20px 12px rgba(0,0,0,0.1);backdrop-filter:hue-rotate(10deg) blur(5px);border-radius:10px 0px 0px 0px;'>\
+                            <div style='padding:30px;padding-bottom:40px;'>user:<input style='padding:5px;' placeholder='root' type='text' id='user' name='user'>pass:<input style='padding:5px;' type='password' id='pass' name='pass'>   <input style='background-color:rgba(200,200,200,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:4px;padding:5px;' type='button' value='submit' onclick='submit()'></div>"
+                            document.body.innerHTML += "</div>"
                             setInterval(() => {
                                 deg += 10
 
