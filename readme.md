@@ -1,6 +1,8 @@
 # kanna
 
-security project to learn client and server encryption
+because the internet needs rewriting
+
+security project to ~~learn client and server encryption~~ mail & advanced requests
 
 create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./selfsigned.key -out selfsigned.crt`
 
@@ -22,3 +24,8 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] login
 - [ ] performance related
   - [ ] store all listeners in array and kill
+
+## currently
+
+- [ ] learning how mail works
+- [ ] imap cli

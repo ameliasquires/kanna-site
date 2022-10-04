@@ -1,0 +1,55 @@
+<html>
+
+<head>
+    <title>mail</title>
+</head>
+
+<body>
+    <script>
+        function sendenc(location, content) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", window.location.href + location, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == XMLHttpRequest.DONE) {
+                    pub = kekw.decrypt(JSON.parse(xhr.responseText).data);
+                    return pub
+                }
+            }
+            let out = {}
+            Object.assign(out, { json: true, enc: false }, { data: nodersa(pub, 'pkcs8-public').encrypt(content, { date: new Date() }, 'base64') })
+            xhr.send(JSON.stringify(out))
+        }
+        function sendnoenc(location, content) {
+            var promise = new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", window.location.href + location, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        resolve(xhr.responseText);
+                    }
+                }
+                let out = {}
+                Object.assign(out, { json: true, enc: false }, content)
+                xhr.send(JSON.stringify(out))
+            })
+            return (promise)
+        }
+        document.onkeypress = function (key) {
+            key = key || window.event;
+            if (key.key == "Enter") {
+                submit()
+            }
+        };
+        function update() {
+            console.log('hi')
+            sendnoenc('', { 'user': 'root', 'pass': 'password' }).then(res => {
+                console.log(res)
+            })
+        }
+    </script>
+</body>
+<button onclick="update()">update mail</button>
+
+</html>

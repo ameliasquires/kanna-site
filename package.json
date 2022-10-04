@@ -23,5 +23,8 @@
     "fs": "^0.0.1-security",
     "ip": "^1.1.8",
     "node-rsa": "^1.1.1"
+  },
+  "devDependencies": {
+    "emailjs-imap-client": "^3.1.0"
   }
 }
