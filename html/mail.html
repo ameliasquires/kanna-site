@@ -2,28 +2,46 @@
 
 <head>
     <title>mail</title>
+    <script src="/src/bundle.js"></script>
 </head>
 
-<body>
+<body onload="load()">
     <script>
-        function sendenc(location, content) {
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", window.location.href + location, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState == XMLHttpRequest.DONE) {
-                    pub = kekw.decrypt(JSON.parse(xhr.responseText).data);
-                    return pub
-                }
+        const sid = makeid(20)
+        window.sid = sid
+        function makeid(length) {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() *
+                    charactersLength));
             }
-            let out = {}
-            Object.assign(out, { json: true, enc: false }, { data: nodersa(pub, 'pkcs8-public').encrypt(content, { date: new Date() }, 'base64') })
-            xhr.send(JSON.stringify(out))
+            return result;
+        }
+        function sendenc(location, content) {
+            var promise = new Promise((resolve, reject) => {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", window.location.href + location, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == XMLHttpRequest.DONE) {
+                        console.log('recived')
+                        pub = new TextDecoder().decode(kekw.decrypt(JSON.parse(xhr.responseText).data));
+                        console.log('decrypted')
+                        resolve(pub)
+                    }
+                }
+                let out = {}
+                Object.assign(out, { json: true, enc: true, sid: sid }, { data: nodersa(pub, 'pkcs8-public').encrypt({ data: content, date: new Date() }, 'base64') })
+                xhr.send(JSON.stringify(out))
+            })
+            return (promise)
         }
         function sendnoenc(location, content) {
             var promise = new Promise((resolve, reject) => {
                 var xhr = new XMLHttpRequest();
-                xhr.open("POST", window.location.href + location, true);
+                xhr.open("POST", window.location.origin + location, true);
                 xhr.setRequestHeader('Content-Type', 'application/json');
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -42,14 +60,44 @@
                 submit()
             }
         };
+        let emails = []
         function update() {
-            console.log('hi')
-            sendnoenc('', { 'user': 'root', 'pass': 'password' }).then(res => {
-                console.log(res)
+            //console.log('hi')
+            sendenc('/get', { 'user': 'root', 'pass': 'password' }).then(res => {
+                res = JSON.parse(res)
+                console.log('parsed')
+                emails = res.reverse()
             })
         }
+        let mypriv, mypub, pub, kekw
+        async function load() {
+
+            kekw = await nodersa({ b: 512 })
+            mypriv = await kekw.exportKey('pkcs1-private')
+            mypub = await kekw.exportKey('pkcs8-public')
+            pub = await sendnoenc('/pub.key', { sid: sid, pub: mypub })
+            update()
+            setInterval(() => {
+                let ret = ''
+                let evo = false
+
+                for (let email of emails) {
+                    let c = '#2C3333'
+                    if (evo) {
+                        c = '#395B64'
+                    }
+                    evo = !evo
+                    ret += '<div style="color:#A5C9CA;border-radius:10px;max-width:50%;min-width:400px;padding:20px;background-color:' + c + ';">'
+                    ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
+                }
+
+                document.getElementById('emails').innerHTML = ret
+            }, 5000)
+        }
+        //<button onclick="update()">update mail</button>
     </script>
+    <div id="emails"></div>
 </body>
-<button onclick="update()">update mail</button>
+
 
 </html>

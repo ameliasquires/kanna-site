@@ -25,8 +25,35 @@ interface keyring{
  }
 let keyring = {} as keyring
 let key:any;
+var ImapClient = require('emailjs-imap-client').default
+let pass = JSON.parse(readFileSync('pass.json').toString()).pass
 
-
+app.post('/mail/get',(req:any,res:any)=>{
+  var client = new ImapClient('disroot.org', 993, {
+    auth: {
+        user: 'grantsquires',
+        pass: pass
+    }
+  });
+  client.connect().then(()=>{
+    //['uid', 'flags','envelope'] for just header stuff
+    //['uid', 'flags','envelope','body']
+    //body 0 is plani, 1 is html
+    client.listMessages('INBOX', '1:*', ['uid', 'flags','envelope','bodystructure'/*,'body[1]'*/]).then((messages:any) => {
+      //console.log(messages[2]['body[]'])
+      const skey = new NodeRSA()
+      console.log(keyring[req.body.sid])
+      //res.send(JSON.stringify({'data':'hello'}))
+      skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+      res.send(JSON.stringify({data:skey.encrypt(JSON.stringify(messages),'base64'),enc:true,html:true}))
+      client.close()
+  });
+  })
+})
+app.get('/mail', (req:any, res:any) => {
+  res.sendFile(__dirname+'/html/mail.html')
+  
+})
 //http
 var httpServer = http.createServer(app);
 var credentials = {key: privateKey, cert: certificate};
@@ -62,6 +89,7 @@ app.post('/pub.key', async (req:{body:{json:boolean,sid:keyof keyring,pub:string
     mypub:key.exportKey('pkcs8-public'),
     theirpub:req.body.pub}
     res.send(key.exportKey('pkcs8-public'))
+    console.log(keyring)
   }
 })
 
