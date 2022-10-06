@@ -160,9 +160,9 @@
             sendnoenc('pub.key', { sid: sid, pub: mypub })
             readTextFile("kanna.txt").then((kanna) => {
                 let left = -300;
-                let top = -40;
+                let top = '15%';
                 let t = setInterval(() => {
-                    document.getElementById("kanna").innerHTML += "<div style='user-select: none;white-space: nowrap; position:absolute;left:" + left + "px;top:" + top + "%;transform:scale(.5)'><tt><b>" + (kanna.replaceAll("#", "</br>").replaceAll(" ", "<font style='color:rgba(1,1,1,0)'>_</font>")) + "</b></div></tt></a>"
+                    document.getElementById("kanna").innerHTML += "<div style='user-select: none;white-space: nowrap; position:absolute;left:" + left + "px;bottom:" + top + ";transform:scale(.5)'><tt><b>" + (kanna.replaceAll("#", "</br>").replaceAll(" ", "<font style='color:rgba(1,1,1,0)'>_</font>")) + "</b></div></tt></a>"
                     left += 300
                     if (left >= 600) {
                         clearInterval(t)
