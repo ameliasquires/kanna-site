@@ -36,5 +36,7 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
     - [ ] forward
     - [ ] sender info
   - [ ] allow for email account adding (soon)
+  - [ ] docs
+    - [ ] how everthing works (pseudocode)
 
 FeMail (iron mail)
