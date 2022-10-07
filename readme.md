@@ -4,7 +4,7 @@ because the internet needs rewriting
 
 security project to ~~learn client and server encryption~~ mail & advanced requests
 
-create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./selfsigned.key -out selfsigned.crt`
+create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/selfsigned.key -out ./certs/selfsigned.crt`
 
 run `npm i` & `npm start`
 
@@ -27,7 +27,14 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
 
 ## currently
 
-- [ ] learning how mail works
-- [ ] imap cli
+- [x] learning how mail works
+  - [ ] make mail prettier
+  - [ ] add functionality
+    - [ ] send
+    - [ ] reply
+    - [ ] draft
+    - [ ] forward
+    - [ ] sender info
+  - [ ] allow for email account adding (soon)
 
 FeMail (iron mail)
