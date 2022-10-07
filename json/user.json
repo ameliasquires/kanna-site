@@ -1,8 +1,1 @@
-[{
-    "name":"root",
-    "pass":"password",
-    "sudo":true,
-    "last_login":"",
-    "alias":"root",
-    "login_key":""
-}]
+[{"name":"root","hash":"OTVYg/fHYeVbtyrusPl8fV+zQcp1ImjzbP+3Cy+3lk14fl2icYhzlULKtbTpOx4E","sudo":true,"last_login":"","alias":"root","login_key":"Q67f8ylkefiCao2ykXV/wDJvgeNLuVK+7FzRdiWK/Ap4gPZzV8L3hndX3PgU3YeW","mail":"X2vLkGESm6Q8owhEH5RR99g9Fb5ukZ5f0+ZbjF/oFLhF+uoAnRRjXxrzUYwFR8b688xG2zKWUx30xEoRkvB24HkDLXf6BW3kB+dWtIltdROnyNlZIyZIfPaZJ6z+XNz53xPFj6MwIwfbexQFLVz8sVzdRaKr27qvYQrI+ubrwK8nRvrErbTTMzjjsVwiqvvNWGs5L4i8VThvQ9iyVfH+ZLpeabd/CfesbntqWtzt86dBU5Z7ZS2Is5klHqnjk1zUUTXEfegqsQYXFXkb0EykfP1adfLrxmd5s/4QIGIRDBPIGYAqzSvXC1wyRkDKZwL/qmde/0rSqeSZej1JazAYQXwLxez/c80buTHaJGvlGT8dt3IpSYHGBbKG8SYAixqSChiJOodT1hcc00YVLWu+pFSWsCgCBkTjteVbI0OEOQG4O9hr+7ccTA465TYpsFRoN1WyB+s5psTADmYahuFV+OIq6etCNh4qi/Y7cN9rk3sbBZeLQr7LrROXwpeAx7aUiT/m7O1yjuNgsdjYexk/6tr54qLmE8H1+qFPq3kj4j0VjKiC+8SLaW7QkCjnra7ZXuFlYmZ8+uH0cSZLz4/Ok79gaXIeYhfqMl4J8fSElMnLurbF22fVE2NcVUyL1H6ixwpcJJ/qXrCxchBR9OdjfVhbrhD9bwbJ5jE1di9mz0grwa28E9hiKN4Wbw2QPQmU"}]

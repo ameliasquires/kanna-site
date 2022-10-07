@@ -4,4 +4,4 @@ node_modules/
 
 certs/
 
-/pass.json
+json/user.json

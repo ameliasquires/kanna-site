@@ -3,12 +3,45 @@
 <head>
     <title>mail</title>
     <script src="/src/bundle.js"></script>
+    <style>
+        .split {
+            height: 100%;
+            width: 50%;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            overflow-x: hidden;
+            padding-top: 20px;
+        }
+    </style>
 </head>
 
 <body onload="load()">
     <script>
         const sid = makeid(20)
         window.sid = sid
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+        function eraseCookie(name) {
+            document.cookie = name + '=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
         function makeid(length) {
             var result = '';
             var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -63,13 +96,18 @@
         let emails = []
         function update() {
             //console.log('hi')
-            sendenc('/get', { 'user': 'root', 'pass': 'password' }).then(res => {
+            sendenc('/get', { 'user': 'root', 'pass': 'password', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
                 res = JSON.parse(res)
                 console.log('parsed')
                 emails = res.reverse()
             })
         }
         let mypriv, mypub, pub, kekw
+        let preview = -1
+        async function lm(index) {
+            console.log()
+            document.getElementById('view').innerHTML = emails[index]['body[1]']
+        }
         async function load() {
 
             kekw = await nodersa({ b: 512 })
@@ -87,7 +125,7 @@
                         c = '#395B64'
                     }
                     evo = !evo
-                    ret += '<div style="color:#A5C9CA;border-radius:10px;max-width:50%;min-width:400px;padding:20px;background-color:' + c + ';">'
+                    ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="color:#A5C9CA;border-radius:10px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
                     ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
                 }
 
@@ -97,6 +135,11 @@
         //<button onclick="update()">update mail</button>
     </script>
     <div id="emails"></div>
+    <div id="box" class="split" style="background-color:red;right:0;margin:40px;">
+        <div id="view">
+            fneoutvbnoruitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>
+        </div>
+    </div>
 </body>
 
 

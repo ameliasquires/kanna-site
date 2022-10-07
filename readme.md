@@ -29,3 +29,5 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
 
 - [ ] learning how mail works
 - [ ] imap cli
+
+FeMail (iron mail)
