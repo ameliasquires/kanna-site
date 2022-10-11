@@ -24,10 +24,12 @@
         .wrapper {
             display: flex;
             align-self: center;
+
         }
 
         .a {
-            margin-left: 30px;
+            margin: 30px;
+
         }
 
         a:link {
@@ -63,6 +65,7 @@
             border-spacing: 20px;
             border-width: 2px;
             padding: 5px;
+
         }
 
         .bl1 {
@@ -117,7 +120,7 @@
 
 <body onload="load()">
     <h5>
-        404<sub style="font-size:30px">418 <sub style="font-size:10px"></br>i am infact a teapot</sub></sub>
+        404<sub style="font-size:30px">418 </sub>
     </h5></br>
     <!--
     either i dont know this page, or i cant give it to you! <sub><i>no hard feelings
@@ -159,6 +162,18 @@
                 document.getElementsByClassName('bl2')[0].style.top = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().bottom + 15) + 'px'
                 document.getElementsByClassName('bl3')[0].style.left = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().left - 20) + 'px'
                 document.getElementsByClassName('bl4')[0].style.left = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().right) + 'px'
+                if (document.body.clientWidth <= 600) {
+
+                    document.getElementsByClassName('wrapper')[0].style = 'position:absolute;bottom:30%;bottom:20%'
+                    document.getElementById('sowwy').style.display = 'none'
+
+                } else {
+
+                    document.getElementsByClassName('wrapper')[0].style = 'display: flex;\
+            align-self: center;'
+                    document.getElementById('sowwy').style.display = 'block'
+
+                }
             }, 30)
             setTimeout(async () => {
                 document.getElementById('sowwy').innerHTML += 'here! ill ask if them i can tell you the code:)</br>'

@@ -96,7 +96,15 @@
         let emails = []
         function update() {
             //console.log('hi')
-            sendenc('/get', { 'user': 'root', 'pass': 'password', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
+            sendenc('/get/update', { 'user': 'root', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
+                res = JSON.parse(res)
+                console.log('parsed')
+                emails = res.reverse()
+            })
+        }
+        function init() {
+            //console.log('hi')
+            sendenc('/get/storage', { 'user': 'root', 'pass': 'password', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
                 res = JSON.parse(res)
                 console.log('parsed')
                 emails = res.reverse()
@@ -114,7 +122,11 @@
             mypriv = await kekw.exportKey('pkcs1-private')
             mypub = await kekw.exportKey('pkcs8-public')
             pub = await sendnoenc('/pub.key', { sid: sid, pub: mypub })
-            update()
+            if (getCookie('login_key') == null) {
+                window.location.href = '/'
+            } else {
+                init()
+            }
             setInterval(() => {
                 let ret = ''
                 let evo = false
@@ -125,7 +137,7 @@
                         c = '#395B64'
                     }
                     evo = !evo
-                    ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="color:#A5C9CA;border-radius:10px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
+                    ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="white-space: pre-wrap;color:#A5C9CA;border-radius:10px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
                     ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
                 }
 
@@ -135,9 +147,8 @@
         //<button onclick="update()">update mail</button>
     </script>
     <div id="emails"></div>
-    <div id="box" class="split" style="background-color:red;right:0;margin:40px;">
+    <div id="box" class="split" style="white-space: pre-wrap;background-color:red;right:0;margin:40px;">
         <div id="view">
-            fneoutvbnoruitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>uitnvorntvo</br>
         </div>
     </div>
 </body>

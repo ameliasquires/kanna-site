@@ -6,6 +6,6 @@
     "last_login": "",
     "alias": "root",
     "login_key": "",
-    "mail": ""
+    "mail": "json stringified encrypted(with user hash in b64)|needs:address,host,port,auth/password"
   }
 ]

@@ -51,9 +51,8 @@ interface keyring{
 let keyring = {} as keyring
 let key:any;
 var ImapClient = require('emailjs-imap-client').default
-//let pass = JSON.parse(readFileSync('pass.json').toString()).pass
 
-app.post('/mail/get',(req:any,res:any)=>{
+app.post('/mail/get/update',(req:any,res:any)=>{
   const key = new NodeRSA({b: 1024})
 
   key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
@@ -61,7 +60,7 @@ app.post('/mail/get',(req:any,res:any)=>{
   //console.log(key)
   //console.log(dec.data.login_key)
   let users = JSON.parse(readFileSync('json/user.json').toString())
-  let logkey,mail
+  let logkey:any,mail:any
   for(let user of users){
     //console.log(user,dec)
     if(user.name==dec.data.user){
@@ -83,10 +82,41 @@ app.post('/mail/get',(req:any,res:any)=>{
     client.listMessages('INBOX', '1:*', ['uid', 'flags','envelope','bodystructure','body[1]' ]).then((messages:any) => {
       const skey = new NodeRSA()
       skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+      for(let user of users){
+        if(user.name==dec.data.user){
+          users[users.indexOf(user)].mail = JSON.parse(decrypt(users[users.indexOf(user)].mail,logkey))
+          users[users.indexOf(user)].mail.emails[parseInt(dec.data.requested)].storage = messages
+          delete users[users.indexOf(user)].mail.storage
+          users[users.indexOf(user)].mail = encrypt(JSON.stringify(users[users.indexOf(user)].mail),logkey)
+          fs.writeFileSync('./json/user.json',JSON.stringify(users))
+          break
+        }
+      }
+      //console.log(users,(JSON.stringify(messages)))
+      
       res.send(JSON.stringify({data:skey.encrypt(JSON.stringify(messages),'base64'),enc:true,html:true}))
       client.close()
   });
   })
+})
+app.post('/mail/get/storage',(req:any,res:any)=>{
+  const key = new NodeRSA({b: 1024})
+  const skey = new NodeRSA()
+  skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+  key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
+  let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
+
+  let users = JSON.parse(readFileSync('./json/user.json').toString())
+  let logkey:any,mail:any
+  for(let user of users){
+    //console.log(user,dec)
+    if(user.name==dec.data.user){
+      logkey = (decrypt(user.login_key,dec.data.login_key))
+      mail =JSON.parse(decrypt(user.mail,logkey))
+    }
+  }
+  
+  res.send(JSON.stringify({data:skey.encrypt((mail.emails[parseInt(dec.data.requested)].storage),'base64'),enc:true,html:true}))
 })
 app.get('/mail', (req:any, res:any) => {
   res.sendFile(__dirname+'/html/mail.html')
@@ -94,7 +124,6 @@ app.get('/mail', (req:any, res:any) => {
 })
 
 app.get('/', (req:any, res:any) => {
-  console.log('test')
   res.sendFile(__dirname+"/html/index.html")
 })
 app.get('/kanna.txt', (req:any, res:any) => {
@@ -139,7 +168,7 @@ app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string
       let logkey = crypt.createHash('md5').update(crypt.randomBytes(64).toString('hex')).digest('hex')
       res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({login_key:logkey}),'base64'),enc:true,html:false,json:true,type:'key'}))
       users[users.indexOf(user)].login_key = encrypt(hash,logkey)
-      console.log(users[users.indexOf(user)].login_key,logkey,hash)
+      //console.log(users[users.indexOf(user)].login_key,logkey,hash)
       //console.log(users)
       writeFileSync('./json/user.json',JSON.stringify(users))
     }
@@ -148,6 +177,7 @@ app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string
 app.use((req:any, res:any, next:any) => {
   res.status(418).sendFile(__dirname+'/html/404.html')
 })
+
 //http
 var httpServer = http.createServer(app);
 var credentials = {key: privateKey, cert: certificate};

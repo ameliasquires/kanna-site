@@ -29,8 +29,10 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
 ## currently
 
 - [x] learning how mail works
+  - [ ] sexify
   - [ ] make mail prettier
   - [ ] add functionality
+    - [x] storage for quicker (initial)loading
     - [ ] send
     - [ ] reply
     - [ ] draft
@@ -38,6 +40,8 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
     - [ ] sender info
   - [ ] allow for email account adding (soon)
   - [ ] docs
-    - [ ] how everthing works (pseudocode)
+  - [ ] extra pages
+    - [x] 404 page
+  - [ ] sub domains
 
 FeMail (iron mail)
