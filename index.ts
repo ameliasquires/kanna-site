@@ -92,21 +92,9 @@ app.get('/mail', (req:any, res:any) => {
   res.sendFile(__dirname+'/html/mail.html')
   
 })
-//http
-var httpServer = http.createServer(app);
-var credentials = {key: privateKey, cert: certificate};
-var httpsServer = https.createServer(credentials, app);
-app.listen(8080,()=>{
-  log(`kanna is local http://${ip.address()}:8080`)
-})
-httpServer.listen(80, () => {
-  log(`kanna is on http://${ip.address()} click on me click on me! :3`)
-})
-httpsServer.listen(443, () => {
-  log(`kanna is secure now too!! https://${ip.address()}`)
-})
-//end
+
 app.get('/', (req:any, res:any) => {
+  console.log('test')
   res.sendFile(__dirname+"/html/index.html")
 })
 app.get('/kanna.txt', (req:any, res:any) => {
@@ -157,7 +145,23 @@ app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string
     }
   }
 })
-  
+app.use((req:any, res:any, next:any) => {
+  res.status(418).sendFile(__dirname+'/html/404.html')
+})
+//http
+var httpServer = http.createServer(app);
+var credentials = {key: privateKey, cert: certificate};
+var httpsServer = https.createServer(credentials, app);
+app.listen(8008,()=>{
+  log(`kanna is local http://${ip.address()}:8080`)
+})
+httpServer.listen(80, () => {
+  log(`kanna is on http://${ip.address()} click on me click on me! :3`)
+})
+httpsServer.listen(443, () => {
+  log(`kanna is secure now too!! https://${ip.address()}`)
+})
+//end
 /*let l = (encrypt(JSON.stringify({
         'emails':[{
           'address':'grantsquires@disroot.org',

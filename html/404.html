@@ -1,0 +1,176 @@
+<html>
+
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxygen+Mono&family=Source+Code+Pro&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            background-color: darkslateblue;
+            font-family: 'Oxygen Mono', monospace;
+            display: flex;
+            align-self: center;
+            padding: 30px;
+        }
+
+        h5 {
+            font-size: 88;
+
+            font-family: 'Oxygen Mono', monospace;
+
+        }
+
+        .wrapper {
+            display: flex;
+            align-self: center;
+        }
+
+        .a {
+            margin-left: 30px;
+        }
+
+        a:link {
+            color: peachpuff;
+        }
+
+        /* visited link */
+        a:visited {
+            color: peachpuff;
+        }
+
+        /* mouse over link */
+        a:hover {
+            color: peachpuff;
+        }
+
+        /* selected link */
+        a:active {
+            color: peachpuff;
+        }
+
+        #sowwy {
+            align-self: none;
+            display: block;
+            position: fixed;
+            top: 60%;
+            left: 5%;
+            margin: 0px;
+        }
+
+        .coollines {
+            border-style: solid;
+            border-spacing: 20px;
+            border-width: 2px;
+            padding: 5px;
+        }
+
+        .bl1 {
+            border-style: dotted none none none;
+            border-color: aquamarine;
+            border-spacing: 20px;
+            border-width: 2px;
+            padding: 5px;
+            width: 100%;
+            position: fixed;
+            top: 18%;
+            left: 0%;
+        }
+
+        .bl2 {
+            border-style: dotted none none none;
+            border-color: aquamarine;
+            border-spacing: 20px;
+            border-width: 2px;
+            padding: 5px;
+            width: 100%;
+            position: fixed;
+            top: 34%;
+            left: 0%;
+        }
+
+        .bl3 {
+            border-style: none dotted none none;
+            border-color: aquamarine;
+            border-spacing: 20px;
+            border-width: 2px;
+            padding: 5px;
+            height: 100%;
+            position: fixed;
+            top: 0%;
+            left: 22%;
+        }
+
+        .bl4 {
+            border-style: none dotted none none;
+            border-color: aquamarine;
+            border-spacing: 20px;
+            border-width: 2px;
+            padding: 5px;
+            height: 100%;
+            position: fixed;
+            top: 0%;
+            left: 88.5%;
+        }
+    </style>
+</head>
+
+<body onload="load()">
+    <h5>
+        404<sub style="font-size:30px">418 <sub style="font-size:10px"></br>i am infact a teapot</sub></sub>
+    </h5></br>
+    <!--
+    either i dont know this page, or i cant give it to you! <sub><i>no hard feelings
+            i hope!</i></sub>-->
+    <div class="bl1"></div>
+    <div class="bl2"></div>
+    <div class="bl3"></div>
+    <div class="bl4"></div>
+    <div class="wrapper">
+        <span class="a">
+
+
+
+            <div class="coollines ">
+                either i dont know this page, or i cant give it to you! <sub><i>no hard feelings
+                        i hope!</i></sub>
+
+                <span class="a"></br>
+                    <sub><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">what could it be?
+                            400,401,403,404,405,408,429 (or 500-511 for server fault)</a></sub>
+                    </br><sub><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Status">what is it not? 402
+                            &
+                            200-299 (duh)</a></sub>
+                </span>
+
+            </div>
+    </div>
+    </span>
+    </div>
+
+    <script>
+        function load() {
+            document.getElementsByClassName('bl1')[0].style.top = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().top - 15) + 'px'
+            document.getElementsByClassName('bl2')[0].style.top = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().bottom + 15) + 'px'
+            document.getElementsByClassName('bl3')[0].style.left = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().left - 20) + 'px'
+            document.getElementsByClassName('bl4')[0].style.left = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().right) + 'px'
+            setInterval(() => {
+                document.getElementsByClassName('bl1')[0].style.top = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().top - 15) + 'px'
+                document.getElementsByClassName('bl2')[0].style.top = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().bottom + 15) + 'px'
+                document.getElementsByClassName('bl3')[0].style.left = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().left - 20) + 'px'
+                document.getElementsByClassName('bl4')[0].style.left = (document.getElementsByClassName('coollines')[0].getBoundingClientRect().right) + 'px'
+            }, 30)
+            setTimeout(async () => {
+                document.getElementById('sowwy').innerHTML += 'here! ill ask if them i can tell you the code:)</br>'
+                setInterval(() => {
+                    document.getElementById('sowwy').innerHTML += 'they said no</br>'
+                }, 2000)
+            }, 2000)
+        }
+    </script>
+</body>
+<div id="sowwy">
+
+</div>
+
+</html>
