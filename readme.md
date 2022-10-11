@@ -4,9 +4,37 @@ because the internet needs rewriting
 
 security project to ~~learn client and server encryption~~ mail & advanced requests
 
-create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/selfsigned.key -out ./certs/selfsigned.crt`
+## hosting
+
+### initial (needed) files
+
+create user.json (refer to ./json/user.example.json)
+
+create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/selfsigned.key -out ./certs/selfsigned.crt`, or insert which ever ones to `./certs/selfsigned.key` and to `./certs/selfsigned.crt` respectively
+
+---
+
+### running
+
+#### windows
+
+dependencies:
+
+-[ ] ts-node |`sudo npm i -g ts-node`
 
 run `npm i` & `npm start`
+
+---
+
+#### \*nix
+
+dependencies:
+
+-[ ] ts-node |`sudo npm i -g ts-node`
+
+run `npm i` & `sudo ts-node .`
+
+---
 
 <sub>kanna was here</sub>
 
