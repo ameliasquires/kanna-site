@@ -20,7 +20,7 @@ create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout
 
 dependencies:
 
--[ ] ts-node |`sudo npm i -g ts-node`
+- [ ] ts-node |`sudo npm i -g ts-node`
 
 run `npm i` & `npm start`
 
@@ -30,7 +30,7 @@ run `npm i` & `npm start`
 
 dependencies:
 
--[ ] ts-node |`sudo npm i -g ts-node`
+- [ ] ts-node |`sudo npm i -g ts-node`
 
 run `npm i` & `sudo ts-node .`
 
