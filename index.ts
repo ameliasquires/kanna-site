@@ -99,13 +99,45 @@ app.post('/mail/get/update',(req:any,res:any)=>{
   });
   })
 })
-app.post('/mail/get/storage',(req:any,res:any)=>{
+app.post('/mail/reg',async(req:any,res:any)=>{
   const key = new NodeRSA({b: 1024})
   const skey = new NodeRSA()
   skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
   key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
   let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
 
+  let users = JSON.parse(readFileSync('./json/user.json').toString())
+  let logkey:any,mail:any
+  console.log(dec)
+  for(let user of users){
+    
+    if(user.name==dec.data.user){
+      logkey = await (decrypt(user.login_key,dec.data.login_key))
+      console.log(logkey)
+      mail=users.indexOf(user)
+    }
+  }
+  users[mail].mail=encrypt(JSON.stringify({'emails':[{
+    'address':dec.data.address,
+    'host':dec.data.host,
+    'port':dec.data.port,
+    'creds':dec.data.creds,
+    'salt':crypt.randomBytes(64).toString('hex')
+  }]}),logkey)
+  writeFileSync('./json/user.json',JSON.stringify(users))
+})
+app.get('/mail', (req:any, res:any) => {
+  res.sendFile(__dirname+'/html/mail.html')
+  
+})
+app.post('/mail/get/storage',(req:any,res:any)=>{
+  const key = new NodeRSA({b: 1024})
+  const skey = new NodeRSA()
+  skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+  key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
+  console.log(req.body.data)
+  let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
+  console.log(dec)
   let users = JSON.parse(readFileSync('./json/user.json').toString())
   let logkey:any,mail:any
   for(let user of users){
@@ -115,8 +147,8 @@ app.post('/mail/get/storage',(req:any,res:any)=>{
       mail =JSON.parse(decrypt(user.mail,logkey))
     }
   }
-  
-  res.send(JSON.stringify({data:skey.encrypt((mail.emails[parseInt(dec.data.requested)].storage),'base64'),enc:true,html:true}))
+  let d = skey.encrypt((mail.emails[parseInt(dec.data.requested)].storage),'base64')
+  res.send(JSON.stringify({data:d,enc:true,html:true}))
 })
 app.get('/mail', (req:any, res:any) => {
   res.sendFile(__dirname+'/html/mail.html')

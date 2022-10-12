@@ -57,9 +57,13 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
 ## currently
 
 - [x] learning how mail works
+  - [ ] toggle plaintext/html emails
+  - [ ] option to markdownify email
+  - [ ] write md emails, send as html
   - [ ] sexify
   - [ ] make mail prettier
   - [ ] add functionality
+    - [x] loading screen
     - [x] storage for quicker (initial)loading
     - [ ] send
     - [ ] reply

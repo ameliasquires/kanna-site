@@ -3,15 +3,199 @@
 <head>
     <title>mail</title>
     <script src="/src/bundle.js"></script>
+    <script src=" https://unpkg.com/showdown/dist/showdown.min.js"></script>
     <style>
         .split {
-            height: 100%;
+            height: 90%;
             width: 50%;
             position: fixed;
             z-index: 1;
             top: 0;
             overflow-x: hidden;
-            padding-top: 20px;
+            padding-top: 10px;
+        }
+
+
+
+
+
+        svg.tea {
+            --secondary: white;
+        }
+
+        svg.tea #teabag {
+            transform-origin: top center;
+            transform: rotate(3deg);
+            animation: swing 2s infinite;
+        }
+
+        svg.tea #steamL {
+            stroke-dasharray: 13;
+            stroke-dashoffset: 13;
+            animation: steamLarge 2s infinite;
+        }
+
+        svg.tea #steamR {
+            stroke-dasharray: 9;
+            stroke-dashoffset: 9;
+            animation: steamSmall 2s infinite;
+        }
+
+        @-moz-keyframes swing {
+            50% {
+                transform: rotate(-3deg);
+            }
+        }
+
+        @-webkit-keyframes swing {
+            50% {
+                transform: rotate(-3deg);
+            }
+        }
+
+        @-o-keyframes swing {
+            50% {
+                transform: rotate(-3deg);
+            }
+        }
+
+        @keyframes swing {
+            50% {
+                transform: rotate(-3deg);
+            }
+        }
+
+        @-moz-keyframes steamLarge {
+            0% {
+                stroke-dashoffset: 13;
+                opacity: 0.6;
+            }
+
+            100% {
+                stroke-dashoffset: 39;
+                opacity: 0;
+            }
+        }
+
+        @-webkit-keyframes steamLarge {
+            0% {
+                stroke-dashoffset: 13;
+                opacity: 0.6;
+            }
+
+            100% {
+                stroke-dashoffset: 39;
+                opacity: 0;
+            }
+        }
+
+        @-o-keyframes steamLarge {
+            0% {
+                stroke-dashoffset: 13;
+                opacity: 0.6;
+            }
+
+            100% {
+                stroke-dashoffset: 39;
+                opacity: 0;
+            }
+        }
+
+        @keyframes steamLarge {
+            0% {
+                stroke-dashoffset: 13;
+                opacity: 0.6;
+            }
+
+            100% {
+                stroke-dashoffset: 39;
+                opacity: 0;
+            }
+        }
+
+        @-moz-keyframes steamSmall {
+            10% {
+                stroke-dashoffset: 9;
+                opacity: 0.6;
+            }
+
+            80% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+
+            100% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+        }
+
+        @-webkit-keyframes steamSmall {
+            10% {
+                stroke-dashoffset: 9;
+                opacity: 0.6;
+            }
+
+            80% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+
+            100% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+        }
+
+        @-o-keyframes steamSmall {
+            10% {
+                stroke-dashoffset: 9;
+                opacity: 0.6;
+            }
+
+            80% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+
+            100% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+        }
+
+        @keyframes steamSmall {
+            10% {
+                stroke-dashoffset: 9;
+                opacity: 0.6;
+            }
+
+            80% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+
+            100% {
+                stroke-dashoffset: 27;
+                opacity: 0;
+            }
+        }
+
+        .loading {
+            margin: auto;
+            width: 40px;
+            height: 20em;
+            display: flex;
+            align-items: center
+        }
+
+        .card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background-color: #444444;
         }
     </style>
 </head>
@@ -52,7 +236,7 @@
             }
             return result;
         }
-        function sendenc(location, content) {
+        function sendenc(location, data) {
             var promise = new Promise((resolve, reject) => {
                 var xhr = new XMLHttpRequest();
                 xhr.open("POST", window.location.href + location, true);
@@ -66,7 +250,7 @@
                     }
                 }
                 let out = {}
-                Object.assign(out, { json: true, enc: true, sid: sid }, { data: nodersa(pub, 'pkcs8-public').encrypt({ data: content, date: new Date() }, 'base64') })
+                Object.assign(out, { json: true, enc: true, sid: sid }, { 'data': nodersa(pub, 'pkcs8-public').encrypt({ login_key: getCookie('login_key'), data, date: new Date() }, 'base64') })
                 xhr.send(JSON.stringify(out))
             })
             return (promise)
@@ -96,25 +280,60 @@
         let emails = []
         function update() {
             //console.log('hi')
-            sendenc('/get/update', { 'user': 'root', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
-                res = JSON.parse(res)
-                console.log('parsed')
-                emails = res.reverse()
+            let promie = new Promise((resolve, reject) => {
+                sendenc('/get/update', { 'user': 'root', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
+                    res = JSON.parse(res)
+                    console.log('parsed')
+                    emails = res.reverse()
+                    console.log(res)
+                    umail()
+                    resolve(res)
+                })
             })
+            return promie
         }
         function init() {
             //console.log('hi')
-            sendenc('/get/storage', { 'user': 'root', 'pass': 'password', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
-                res = JSON.parse(res)
-                console.log('parsed')
-                emails = res.reverse()
-            })
+            let promie = new Promise((resolve, reject) => {
+                sendenc('/get/storage', { 'user': 'root', 'pass': 'password', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
+                    res = JSON.parse(res)
+                    console.log('parsed')
+                    emails = res.reverse()
+                    umail()
+                    resolve(res)
+                })
+            });
+            return (promie)
+
         }
         let mypriv, mypub, pub, kekw
         let preview = -1
+        var converter = new showdown.Converter()
         async function lm(index) {
-            console.log()
-            document.getElementById('view').innerHTML = emails[index]['body[1]']
+            let m = ((emails[index]['body[1]']))
+            var linkify = m.replace(/(<a href=")?((https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)))(">(.*)<\/a>)?/gi, function () {
+                return '<a href="' + arguments[2] + '">' + (arguments[7] || arguments[2]) + '</a>'
+            });
+            document.getElementById('box').style.display = 'block'
+            document.getElementById('view').innerHTML = converter.makeHtml(linkify)
+
+
+        }
+        function umail() {
+            let ret = ''
+            let evo = false
+
+            for (let email of emails) {
+                let c = '#2C3333'
+                if (evo) {
+                    c = '#395B64'
+                }
+                evo = !evo
+                ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="white-space: pre-wrap;color:#A5C9CA;border-radius:10px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
+                ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
+            }
+
+            document.getElementById('emails').innerHTML = ret
         }
         async function load() {
 
@@ -122,35 +341,57 @@
             mypriv = await kekw.exportKey('pkcs1-private')
             mypub = await kekw.exportKey('pkcs8-public')
             pub = await sendnoenc('/pub.key', { sid: sid, pub: mypub })
+
             if (getCookie('login_key') == null) {
                 window.location.href = '/'
-            } else {
-                init()
             }
-            setInterval(() => {
-                let ret = ''
-                let evo = false
-
-                for (let email of emails) {
-                    let c = '#2C3333'
-                    if (evo) {
-                        c = '#395B64'
-                    }
-                    evo = !evo
-                    ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="white-space: pre-wrap;color:#A5C9CA;border-radius:10px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
-                    ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
+            await init()
+            //return
+            //document.getElementsByClassName('loading')[0].style.display = 'none'
+            let xx = document.getElementsByClassName('card')[0]
+            let xy = xx.style.top
+            let x = setInterval(() => {
+                if (xy >= 100) {
+                    clearInterval(x)
                 }
+                document.getElementsByClassName('card')[0].style.top = xy + '%'
+                xy -= 15
 
-                document.getElementById('emails').innerHTML = ret
+            }, 10)
+
+
+            setInterval(() => {
+                umail()
             }, 5000)
         }
         //<button onclick="update()">update mail</button>
     </script>
+    <div class="card">
+        <div class="loading">
+            <svg class="tea" width="37" height="48" viewbox="0 0 37 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M27.0819 17H3.02508C1.91076 17 1.01376 17.9059 1.0485 19.0197C1.15761 22.5177 1.49703 29.7374 2.5 34C4.07125 40.6778 7.18553 44.8868 8.44856 46.3845C8.79051 46.79 9.29799 47 9.82843 47H20.0218C20.639 47 21.2193 46.7159 21.5659 46.2052C22.6765 44.5687 25.2312 40.4282 27.5 34C28.9757 29.8188 29.084 22.4043 29.0441 18.9156C29.0319 17.8436 28.1539 17 27.0819 17Z"
+                    stroke="var(--secondary)" stroke-width="2"></path>
+                <path
+                    d="M29 23.5C29 23.5 34.5 20.5 35.5 25.4999C36.0986 28.4926 34.2033 31.5383 32 32.8713C29.4555 34.4108 28 34 28 34"
+                    stroke="var(--secondary)" stroke-width="2"></path>
+                <path id="teabag" fill="var(--secondary)" fill-rule="evenodd" clip-rule="evenodd"
+                    d="M16 25V17H14V25H12C10.3431 25 9 26.3431 9 28V34C9 35.6569 10.3431 37 12 37H18C19.6569 37 21 35.6569 21 34V28C21 26.3431 19.6569 25 18 25H16ZM11 28C11 27.4477 11.4477 27 12 27H18C18.5523 27 19 27.4477 19 28V34C19 34.5523 18.5523 35 18 35H12C11.4477 35 11 34.5523 11 34V28Z">
+                </path>
+                <path id="steamL" d="M17 1C17 1 17 4.5 14 6.5C11 8.5 11 12 11 12" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" stroke="var(--secondary)"></path>
+                <path id="steamR" d="M21 6C21 6 21 8.22727 19 9.5C17 10.7727 17 13 17 13" stroke="var(--secondary)"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+        </div>
+    </div>
     <div id="emails"></div>
-    <div id="box" class="split" style="white-space: pre-wrap;background-color:red;right:0;margin:40px;">
+    <div id="box" class="split"
+        style="display:none;white-space: pre-wrap;background-color:peachpuff;right:0;margin:40px;">
         <div id="view">
         </div>
     </div>
+
 </body>
 
 
