@@ -1,4 +1,5 @@
 import { readFileSync, writeFileSync } from "fs"
+import { LogLevel } from "node-ts";
 var privateKey  = readFileSync('certs/selfsigned.key', 'utf8');
 var certificate = readFileSync('certs/selfsigned.crt', 'utf8');
 var http = require('http');
@@ -13,7 +14,33 @@ app.use(bodyParser.json());
 const NodeRSA = require('node-rsa');
 var ip = require("ip")
 var crypt = require('crypto');
-
+Object.defineProperty(global, '__stack', {
+  get: function() {
+          var orig = Error.prepareStackTrace;
+          Error.prepareStackTrace = function(_, stack) {
+              return stack;
+          };
+          var err = new Error;
+          Error.captureStackTrace(err, arguments.callee);
+          var stack = err.stack;
+          Error.prepareStackTrace = orig;
+          return stack;
+      }
+  });
+  
+  Object.defineProperty(global, '__line', {
+  get: function() {
+          // @ts-ignore
+          return __stack[1].getLineNumber();
+      }
+  });
+  
+  Object.defineProperty(global, '__function', {
+  get: function() {
+    // @ts-ignore
+          return __stack[1].getFunctionName();
+      }
+  });
 const IV = "5183666c72eec9e4"; //!not really sure what this is lol 
 //TODO: learn what IV is
 var encrypt = ((val:any,ENC_KEY:any) => {
@@ -34,7 +61,11 @@ var decrypt = ((encrypted:any,ENC_KEY:any) => {
 //
 function log(m:any){
   var date = new Date;
-  console.log('['+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+'] ' + m.toString())
+  let e:any = new Error();
+  let frame = e.stack.split("\n")[2]; // change to 3 for grandparent func
+  let lineNumber = frame.split(":").reverse()[1];
+  let functionName = frame.split(" ")[5];
+  console.log('['+functionName+'/'+lineNumber+'][./index.ts]'+'['+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+'] ' + m.toString())
 }
 function d(){
   var date = new Date;
@@ -72,14 +103,23 @@ app.post('/mail/get/update',(req:any,res:any)=>{
   var client = new ImapClient(mail.host, parseInt(mail.port), {
     auth: {
         user: mail.address,
-        pass: mail.creds
-    }
+        pass: mail.creds,
+        
+    },logLevel:1000
   });
   client.connect().then(()=>{
     //['uid', 'flags','envelope'] for just header stuff
     //['uid', 'flags','envelope','body']
-    //body 0 is plani, 1 is html
-    client.listMessages('INBOX', '1:*', ['uid', 'flags','envelope','bodystructure','body[1]' ]).then((messages:any) => {
+    //body 0 is plani, 1 is plain
+    let bo="body[0]"
+    for(let user of users){
+      if(user.name==dec.data.user){
+        if(user.settings.html){
+          bo="body[2]"
+        }
+      }
+    }
+    client.listMessages('INBOX', '1:*', ['uid', 'flags','envelope','bodystructure',bo ]).then((messages:any) => {
       const skey = new NodeRSA()
       skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
       for(let user of users){
@@ -93,8 +133,7 @@ app.post('/mail/get/update',(req:any,res:any)=>{
         }
       }
       //console.log(users,(JSON.stringify(messages)))
-      
-      res.send(JSON.stringify({data:skey.encrypt(JSON.stringify(messages),'base64'),enc:true,html:true}))
+      res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:messages,bod:bo}),'base64'),enc:true,html:true}))
       client.close()
   });
   })
@@ -164,6 +203,12 @@ app.get('/kanna.txt', (req:any, res:any) => {
 app.get('/src/bundle.js', (req:any, res:any) => {
   res.sendFile(__dirname+'/src/bundle.js')
 })
+app.get('/src/autolink.js', (req:any, res:any) => {
+  res.sendFile(__dirname+'/src/autolink.js')
+})
+app.get('/src/quoted-printable.js', (req:any, res:any) => {
+  res.sendFile(__dirname+'/src/quoted-printable.js')
+})
 app.get('/src/lights-out.gif', (req:any, res:any) => {
   res.sendFile(__dirname+'/src/lights-out.gif')
 })
@@ -214,13 +259,13 @@ app.use((req:any, res:any, next:any) => {
 var httpServer = http.createServer(app);
 var credentials = {key: privateKey, cert: certificate};
 var httpsServer = https.createServer(credentials, app);
-app.listen(8008,()=>{
+app.listen(8008,function local(){
   log(`kanna is local http://${ip.address()}:8080`)
 })
-httpServer.listen(80, () => {
+httpServer.listen(80, function http() {
   log(`kanna is on http://${ip.address()} click on me click on me! :3`)
 })
-httpsServer.listen(443, () => {
+httpsServer.listen(443, function https() {
   log(`kanna is secure now too!! https://${ip.address()}`)
 })
 //end

@@ -26,7 +26,8 @@
     "ip": "^1.1.8",
     "md5": "^2.3.0",
     "node-rsa": "^1.1.1",
-    "openpgp": "^5.5.0"
+    "openpgp": "^5.5.0",
+    "utf8": "^3.0.0"
   },
   "devDependencies": {
     "emailjs-imap-client": "^3.1.0"

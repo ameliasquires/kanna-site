@@ -4,19 +4,23 @@
     <title>mail</title>
     <script src="/src/bundle.js"></script>
     <script src=" https://unpkg.com/showdown/dist/showdown.min.js"></script>
+    <script src='/src/autolink.js'></script>
+    <script src='/src/quoted-printable.js'></script>
     <style>
         .split {
             height: 90%;
-            width: 50%;
+            width: 51%;
             position: fixed;
             z-index: 1;
             top: 0;
             overflow-x: hidden;
-            padding-top: 10px;
+
         }
 
 
-
+        body {
+            background-color: #444444;
+        }
 
 
         svg.tea {
@@ -278,14 +282,21 @@
             }
         };
         let emails = []
+        let bod
+        let html = false
         function update() {
             //console.log('hi')
             let promie = new Promise((resolve, reject) => {
                 sendenc('/get/update', { 'user': 'root', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
                     res = JSON.parse(res)
                     console.log('parsed')
-                    emails = res.reverse()
+                    emails = res.messages.reverse()
+                    //console.log(res)
                     console.log(res)
+                    bod = res.bod
+                    if (res.bod == 'body[2]') {
+                        html = true
+                    }
                     umail()
                     resolve(res)
                 })
@@ -309,13 +320,18 @@
         let mypriv, mypub, pub, kekw
         let preview = -1
         var converter = new showdown.Converter()
+
         async function lm(index) {
-            let m = ((emails[index]['body[1]']))
-            var linkify = m.replace(/(<a href=")?((https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)))(">(.*)<\/a>)?/gi, function () {
-                return '<a href="' + arguments[2] + '">' + (arguments[7] || arguments[2]) + '</a>'
-            });
+            let m
+            if (html) {
+                m = autoLink((emails[index]['body[2]']))
+            } else {
+                m = converter.makeHtml(autoLink((quotedPrintable.decode(emails[index]['body[0]']))))
+            }
+
+
             document.getElementById('box').style.display = 'block'
-            document.getElementById('view').innerHTML = converter.makeHtml(linkify)
+            document.getElementById('view').innerHTML = (m)
 
 
         }
@@ -329,7 +345,7 @@
                     c = '#395B64'
                 }
                 evo = !evo
-                ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="white-space: pre-wrap;color:#A5C9CA;border-radius:10px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
+                ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="height:10%;white-space: pre-wrap;color:#A5C9CA;border-radius:5px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
                 ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
             }
 
@@ -345,7 +361,7 @@
             if (getCookie('login_key') == null) {
                 window.location.href = '/'
             }
-            await init()
+            await update()
             //return
             //document.getElementsByClassName('loading')[0].style.display = 'none'
             let xx = document.getElementsByClassName('card')[0]

@@ -70,10 +70,12 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
     - [ ] draft
     - [ ] forward
     - [ ] sender info
-  - [ ] allow for email account adding (soon)
+  - [ ] allow for email account adding
   - [ ] docs
   - [ ] extra pages
     - [x] 404 page
   - [ ] sub domains
+  - [ ] make my own libs
+    - [ ] encryption (md5 hashing, and rsa)
 
 FeMail (iron mail)
