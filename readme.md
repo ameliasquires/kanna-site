@@ -65,6 +65,7 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] add functionality
     - [x] loading screen
     - [x] storage for quicker (initial)loading
+    - [x] delete
     - [ ] send
     - [ ] reply
     - [ ] draft
