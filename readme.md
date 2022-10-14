@@ -77,5 +77,6 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] sub domains
   - [ ] make my own libs
     - [ ] encryption (md5 hashing, and rsa)
+  - [ ] add aliases that are used in cookies and randomly gen.
 
 FeMail (iron mail)

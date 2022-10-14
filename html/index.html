@@ -123,7 +123,7 @@
             var xhr = new XMLHttpRequest();
             xhr.open("POST", window.location.href + 'login/submit', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onreadystatechange = function () {
+            xhr.onreadystatechange = async function () {
                 if (xhr.readyState == XMLHttpRequest.DONE) {
                     let dec = (kekw.decrypt(JSON.parse(xhr.responseText).data));
                     if (JSON.parse(xhr.responseText).html) {
@@ -132,7 +132,10 @@
                     if (JSON.parse(xhr.responseText).json && JSON.parse(xhr.responseText).type == 'key') {
                         let decc = new TextDecoder().decode(dec)
                         //console.log(JSON.parse(decc))
-                        setCookie('login_key', JSON.parse(decc).login_key, 7)
+                        let u = await document.getElementById('user').value
+                        await setCookie('login_key', JSON.parse(decc).login_key, 7)
+                        await setCookie('user', u, 7)
+                        location.href = location.href + 'home'
                     }
                 }
             }

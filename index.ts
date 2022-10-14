@@ -138,6 +138,42 @@ app.post('/mail/get/update',(req:any,res:any)=>{
   });
   })
 })
+app.post('/mail/del',(req:any,res:any)=>{
+  const key = new NodeRSA({b: 1024})
+
+  key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
+  let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
+  //console.log(key)
+  //console.log(dec.data.login_key)
+  let users = JSON.parse(readFileSync('json/user.json').toString())
+  let logkey:any,mail:any
+  for(let user of users){
+    //console.log(user,dec)
+    if(user.name==dec.data.user){
+      logkey = (decrypt(user.login_key,dec.data.login_key))
+      mail =JSON.parse(decrypt(user.mail,logkey)).emails[parseInt(dec.data.requested)]
+    }
+  }
+  //console.log(JSON.parse(decrypt(users[0].mail,logkey)).emails)
+  var client = new ImapClient(mail.host, parseInt(mail.port), {
+    auth: {
+        user: mail.address,
+        pass: mail.creds,
+        
+    },logLevel:1000
+  });
+  client.connect().then(()=>{
+    const skey = new NodeRSA()
+      skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+    client.deleteMessages('INBOX',dec.data.index).then(()=>{
+      res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({'comp':true}),'base64'),enc:true,html:true}))
+      client.close()
+    })
+      //console.log(users,(JSON.stringify(messages)))
+      
+  
+  })
+})
 app.post('/mail/reg',async(req:any,res:any)=>{
   const key = new NodeRSA({b: 1024})
   const skey = new NodeRSA()
@@ -147,7 +183,6 @@ app.post('/mail/reg',async(req:any,res:any)=>{
 
   let users = JSON.parse(readFileSync('./json/user.json').toString())
   let logkey:any,mail:any
-  console.log(dec)
   for(let user of users){
     
     if(user.name==dec.data.user){
@@ -214,6 +249,12 @@ app.get('/src/lights-out.gif', (req:any, res:any) => {
 })
 app.get('/src/kanna.gif', (req:any, res:any) => {
   res.sendFile(__dirname+'/src/kanna.gif')
+})
+app.get('/src/sauce-code-mono.ttf', (req:any, res:any) => {
+  res.sendFile(__dirname+'/src/sauce-code-mono.ttf')
+})
+app.get('/home', (req:any, res:any) => {
+  res.sendFile(__dirname+'/html/home.html')
 })
 app.post('/pub.key', async (req:{body:{json:boolean,sid:keyof keyring,pub:string}}, res:any) => {
   if(req.body.json){

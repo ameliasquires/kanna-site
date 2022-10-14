@@ -6,6 +6,12 @@
     <script src=" https://unpkg.com/showdown/dist/showdown.min.js"></script>
     <script src='/src/autolink.js'></script>
     <script src='/src/quoted-printable.js'></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
     <style>
         .split {
             height: 90%;
@@ -19,7 +25,9 @@
 
 
         body {
-            background-color: #444444;
+            background-color: #4F3F4A;
+            /*font-family: 'Source Code Pro', monospace; this font is pretty too:)*/
+            font-family: 'Baloo 2', cursive;
         }
 
 
@@ -201,6 +209,26 @@
             width: 100%;
             background-color: #444444;
         }
+
+        .trashcan {
+
+            float: right;
+            display: inline;
+            width: 20px;
+            height: 20px;
+        }
+
+        .trashcan .trashcan-open {
+            display: none;
+        }
+
+        .trashcan:hover .trashcan-open {
+            display: inline;
+        }
+
+        .trashcan:hover .trashcan-closed {
+            display: none;
+        }
     </style>
 </head>
 
@@ -248,9 +276,9 @@
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == XMLHttpRequest.DONE) {
                         console.log('recived')
-                        pub = new TextDecoder().decode(kekw.decrypt(JSON.parse(xhr.responseText).data));
+                        let pubb = new TextDecoder().decode(kekw.decrypt(JSON.parse(xhr.responseText).data));
                         console.log('decrypted')
-                        resolve(pub)
+                        resolve(pubb)
                     }
                 }
                 let out = {}
@@ -323,6 +351,11 @@
 
         async function lm(index) {
             let m
+            if (preview == index) {
+                document.getElementById('box').style.display = 'none'
+                preview = -1
+                return
+            }
             if (html) {
                 m = autoLink((emails[index]['body[2]']))
             } else {
@@ -332,20 +365,62 @@
 
             document.getElementById('box').style.display = 'block'
             document.getElementById('view').innerHTML = (m)
+            preview = index
 
-
+        }
+        function del(index) {
+            preview = index //to not view in side
+            revved = emails.reverse()
+            index = revved.indexOf(emails[index]) - 1
+            //pretty proud of this reverse indexer :)
+            sendenc('/del', { 'index': index, 'fuck you': true, 'user': 'root', 'login_key': getCookie('login_key'), 'requested': 0 })
         }
         function umail() {
             let ret = ''
             let evo = false
 
             for (let email of emails) {
-                let c = '#2C3333'
+                let c = '#21252B'
                 if (evo) {
-                    c = '#395B64'
+                    c = '#2A3135'
                 }
                 evo = !evo
                 ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="height:10%;white-space: pre-wrap;color:#A5C9CA;border-radius:5px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
+
+                ret += '<svg onclick="del(' + emails.indexOf(email) + ')"  fill="#8b0000" class="trashcan" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 25 24.8" style="enable-background:new 0 0 25 24.8;" xml:space="preserve" class="icon-trashcan ct-delete" data-ember-action="" data-ember-action-1015="1015">\
+  <g class="trashcan-open">\
+    <path d="M18.7,24.4H5.9L4.9,7h14.9L18.7,24.4z M7.6,22.6H17l0.8-13.7h-11L7.6,22.6z"></path>\
+    <polygon points="13.6,10.3 13.1,21.2 14.9,21.2 15.4,10.3 "></polygon>\
+    <polygon points="11.5,21.2 11,10.3 9.2,10.3 9.7,21.2 "></polygon>\
+    <path d="M19.1,0.7l-4.7,0.9l-0.8-1.4L8.2,1.3L8,3l-4.7,1l0.2,4.7l17.3-3.5L19.1,0.7z \
+             \
+             M8.8,1.9l4.4 -1.0 l0.5,0.8\
+             L8.7,2.8z \
+             \
+             M5.2,6.4l0-1L18,2.8l0.3,0.9L5.2,6.4z"></path>\
+  </g>\
+  <g class="trashcan-closed">\
+    <path d="M6.8,8.8h11L17,22.6\
+             H7.6L6.8,8.8z \
+             M4.9,7l1,17.4h12.8\
+             l1-17.4\
+             H4.9z"></path>\
+    <polygon points="13.6,10.3 13.1,21.2 14.9,21.2 15.4,10.3 "></polygon>\
+    <polygon points="11.5,21.2 11,10.3 9.2,10.3 9.7,21.2 "></polygon>\
+    <path d="M20.4,4h-4.8l-0.5-1.6\
+             H9.5L9,4\
+             H4.2\
+             L3.5,8.6h17.6\
+             L20.4,4z \
+             \
+             M9.9,3.2h4.8\
+             L14.9,3.9h-5.2z\
+             \
+             M5.6,6.7l0.2-1 h13l0.2,1\
+             H5.6z"></path>\
+  </g>\
+</svg>'
+
                 ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
             }
 
@@ -361,7 +436,7 @@
             if (getCookie('login_key') == null) {
                 window.location.href = '/'
             }
-            await update()
+            await init()
             //return
             //document.getElementsByClassName('loading')[0].style.display = 'none'
             let xx = document.getElementsByClassName('card')[0]
@@ -377,7 +452,7 @@
 
 
             setInterval(() => {
-                umail()
+                //umail()
             }, 5000)
         }
         //<button onclick="update()">update mail</button>
