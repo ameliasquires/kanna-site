@@ -6,4 +6,6 @@ json/user.json
 
 certs/
 
+data/user.sqlite
+
 

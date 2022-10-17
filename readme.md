@@ -53,6 +53,7 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
 - [ ] performance related
   - [ ] store all listeners in array and kill
   - [ ] go through all html files, clean up code
+- [ ] increase initiation vector (IV) size
 
 ## currently
 
