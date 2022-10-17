@@ -1,5 +1,7 @@
 # kanna
 
+![salt](/docs/src/salt.png)
+
 because the internet needs rewriting
 
 security project to ~~learn client and server encryption~~ mail & advanced requests
