@@ -46,7 +46,9 @@ Object.defineProperty(global, '__stack', {
 
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: 'data/user.sqlite'
+    storage: 'data/user.sqlite',
+    logging: false
+
 });
   let User=sequelize.define('user',{
     "html":DataTypes.BOOLEAN,
@@ -123,9 +125,6 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
 
   key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
   let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
-  //console.log(key)
-  //console.log(dec.data.login_key)
-  //let users = JSON.parse(readFileSync('json/user.json').toString())
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
@@ -135,7 +134,6 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
       mail =JSON.parse(decrypt(user.mail,logkey)).emails[parseInt(dec.data.requested)]
     }
   }
-  //console.log(JSON.parse(decrypt(users[0].mail,logkey)).emails)
   var client = new ImapClient(mail.host, parseInt(mail.port), {
     auth: {
         user: mail.address,
@@ -155,6 +153,7 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
         }
       }
     }
+    try{
     client.listMessages('INBOX', '1:*', ['uid', 'flags','envelope','bodystructure',bo ]).then((messages:any) => {
       const skey = new NodeRSA()
       let mail;
@@ -170,10 +169,21 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
           break
         }
       }
-      //console.log(users,(JSON.stringify(messages)))
       res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:messages,bod:bo}),'base64'),enc:true,html:true}))
       client.close()
+  }).catch((err:any)=>{
+    //! if no messages
+    const skey = new NodeRSA()
+  skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+  res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:[],bod:bo}),'base64'),enc:true,html:true}))
+  client.close()
   });
+} catch(err){
+  const skey = new NodeRSA()
+  skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+  res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:[],bod:bo}),'base64'),enc:true,html:true}))
+  client.close()
+}
   })
 })
 app.post('/mail/del',async(req:any,res:any)=>{
@@ -181,9 +191,6 @@ app.post('/mail/del',async(req:any,res:any)=>{
 
   key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
   let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
-  //console.log(key)
-  //console.log(dec.data.login_key)
-  //let users = JSON.parse(readFileSync('json/user.json').toString())
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
@@ -193,7 +200,6 @@ app.post('/mail/del',async(req:any,res:any)=>{
       mail =JSON.parse(decrypt(user.mail,logkey)).emails[parseInt(dec.data.requested)]
     }
   }
-  //console.log(JSON.parse(decrypt(users[0].mail,logkey)).emails)
   var client = new ImapClient(mail.host, parseInt(mail.port), {
     auth: {
         user: mail.address,
@@ -204,11 +210,11 @@ app.post('/mail/del',async(req:any,res:any)=>{
   client.connect().then(()=>{
     const skey = new NodeRSA()
       skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
-      client.deleteMessages('INBOX',dec.data.index).then(()=>{
+      console.log(dec.data.index)
+      client.deleteMessages('INBOX',dec.data.index+':'+dec.data.index).then(()=>{
       res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({'comp':true}),'base64'),enc:true,html:true}))
       client.close()
     })
-      //console.log(users,(JSON.stringify(messages)))
       
   
   })
@@ -219,8 +225,6 @@ app.post('/mail/reg',async(req:any,res:any)=>{
   skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
   key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
   let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
-
-  //let users = JSON.parse(readFileSync('./json/user.json').toString())
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
@@ -229,16 +233,17 @@ app.post('/mail/reg',async(req:any,res:any)=>{
       logkey = await (decrypt(user.login_key,dec.data.login_key))
       console.log(logkey)
       mail=users.indexOf(user)
+      user.setDataValue('mail',encrypt(JSON.stringify({'emails':[{
+        'address':dec.data.address,
+        'host':dec.data.host,
+        'port':dec.data.port,
+        'creds':dec.data.creds,
+        'salt':crypt.randomBytes(64).toString('hex')
+      }]}),logkey))
+      user.save()
+      User.sync({ alter: true })
     }
   }
-  users[mail].mail=encrypt(JSON.stringify({'emails':[{
-    'address':dec.data.address,
-    'host':dec.data.host,
-    'port':dec.data.port,
-    'creds':dec.data.creds,
-    'salt':crypt.randomBytes(64).toString('hex')
-  }]}),logkey)
-  //users.save()
 })
 app.get('/mail', (req:any, res:any) => {
   res.sendFile(__dirname+'/html/mail.html')
@@ -252,11 +257,9 @@ app.post('/mail/get/storage',async(req:any,res:any)=>{
   console.log(req.body.data)
   let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
   console.log(dec)
-  //let users = JSON.parse(readFileSync('./json/user.json').toString())
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
-    //console.log(user,dec)
     if(user.name==dec.data.user){
       logkey = (decrypt(user.login_key,dec.data.login_key))
       mail =JSON.parse(decrypt(user.mail,logkey))
@@ -306,7 +309,6 @@ app.post('/pub.key', async (req:{body:{json:boolean,sid:keyof keyring,pub:string
     mypub:key.exportKey('pkcs8-public'),
     theirpub:req.body.pub}
     res.send(key.exportKey('pkcs8-public'))
-    //console.log(keyring)
   }
 })
 
@@ -331,9 +333,6 @@ app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string
       user.save()
       User.sync({ alter: true })
       break
-      //console.log(users[users.indexOf(user)].login_key,logkey,hash)
-      //console.log(users)
-      //writeFileSync('./json/user.json',JSON.stringify(users))
     }
   }
 })
@@ -371,3 +370,6 @@ httpsServer.listen(443, function https() {
       }),hash))
 */
 
+/*
+todo: 
+*/
