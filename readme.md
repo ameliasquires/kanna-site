@@ -8,8 +8,6 @@ security project to ~~learn client and server encryption~~ mail & advanced reque
 
 ### initial (needed) files
 
-create user.json (refer to ./json/user.example.json)
-
 create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ./certs/selfsigned.key -out ./certs/selfsigned.crt`, or insert which ever ones to `./certs/selfsigned.key` and to `./certs/selfsigned.crt` respectively
 
 ---
