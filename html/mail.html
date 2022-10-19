@@ -312,21 +312,46 @@
         let emails = []
         let bod
         let html = false
+        function reg() {
+            console.log(document.getElementById('email').value)
+            sendenc('/reg', { 'address': document.getElementById('email').value, 'host': document.getElementById('host').value, 'port': document.getElementById('port').value, 'creds': document.getElementById('auth').value }).then(() => {
+                update()
+            })
+        }
         function update() {
             //console.log('hi')
             let promie = new Promise((resolve, reject) => {
                 sendenc('/get/update', { 'user': 'root', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
                     res = JSON.parse(res)
                     console.log('parsed')
-                    emails = res.messages.reverse()
-                    //console.log(res)
-                    console.log(res)
-                    bod = res.bod
-                    if (res.bod == 'body[2]') {
-                        html = true
+                    if (res.messages == 'reg') {
+                        document.body.style.backgroundColor = '#444444'
+                        document.body.innerHTML = `
+                        <h1>welcome! please add an email:)</h1>
+                        
+                        email: <input style='background-color:rgba(200,200,200,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:4px;padding:5px;'id="email"></input>
+                        </br>
+                        auth/password: <input style='background-color:rgba(200,200,200,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:4px;padding:5px;'type="password" id="auth"></input>
+                        </br>
+                        host: <input style='background-color:rgba(200,200,200,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:4px;padding:5px;'id="host"></input>
+                        </br>
+                        port: <input style='background-color:rgba(200,200,200,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:4px;padding:5px;'value='993' id="port"></input>
+                        </br>
+                        <input style='background-color:rgba(200,200,200,.3);border-color:rgba(80,80,80,.1);border:line;border-radius:4px;padding:5px;' type='button' value='submit' onclick='reg()'>
+                        `;
+                    } else {
+
+
+                        emails = res.messages.reverse()
+                        //console.log(res)
+                        console.log(res)
+                        bod = res.bod
+                        if (res.bod == 'body[2]') {
+                            html = true
+                        }
+                        umail()
+                        resolve(res)
                     }
-                    umail()
-                    resolve(res)
                 })
             })
             return promie
@@ -436,7 +461,7 @@
             if (getCookie('login_key') == null) {
                 window.location.href = '/'
             }
-            await init()
+            await update()
             //return
             //document.getElementsByClassName('loading')[0].style.display = 'none'
             let xx = document.getElementsByClassName('card')[0]

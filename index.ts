@@ -123,6 +123,13 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
       mail =JSON.parse(decrypt(user.mail,logkey)).emails[parseInt(dec.data.requested)]
     }
   }
+  if(mail==''){
+    const skey = new NodeRSA()
+    let mail;
+    skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+    res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:'reg'}),'base64'),enc:true,html:true}))
+    return  
+  }
   var client = new ImapClient(mail.host, parseInt(mail.port), {
     auth: {
         user: mail.address,
@@ -181,7 +188,7 @@ app.post('/mail/del',async(req:any,res:any)=>{
   key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
   let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
   const users:any = await User.findAll();
-  let logkey:any,mail:any
+  let logkey:any,mail:any;
   for(let user of users){
     //console.log(user,dec)
     if(user.name==dec.data.user){
@@ -253,6 +260,13 @@ app.post('/mail/get/storage',async(req:any,res:any)=>{
       logkey = (decrypt(user.login_key,dec.data.login_key))
       mail =JSON.parse(decrypt(user.mail,logkey))
     }
+  }
+  if(mail==''){
+    const skey = new NodeRSA()
+    let mail;
+    skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
+    res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:'reg'}),'base64'),enc:true,html:true}))
+    return  
   }
   let d = skey.encrypt((mail.emails[parseInt(dec.data.requested)].storage),'base64')
   res.send(JSON.stringify({data:d,enc:true,html:true}))
