@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync } from "fs"
-import { LogLevel } from "node-ts";
 var privateKey  = readFileSync('certs/selfsigned.key', 'utf8');
 var certificate = readFileSync('certs/selfsigned.crt', 'utf8');
 var http = require('http');
@@ -91,7 +90,7 @@ function log(m:any){
   let frame = e.stack.split("\n")[2]; // change to 3 for grandparent func
   let lineNumber = frame.split(":").reverse()[1];
   let functionName = frame.split(" ")[5];
-  console.log('['+functionName+'/'+lineNumber+'][./index.ts]'+'['+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+'] ' + m.toString())
+  console.log('\x1b[33m['+functionName+'/'+lineNumber+'][./index.ts]'+'['+date.getHours()+':'+date.getMinutes()+':'+date.getSeconds()+'] \x1b[32m' + m.toString() + '\x1b[0m')
 }
 function d(){
   var date = new Date;
@@ -108,7 +107,31 @@ interface keyring{
 let keyring = {} as keyring
 let key:any;
 var ImapClient = require('emailjs-imap-client').default
-
+/*
+app.use((req:any, res:any, next:any) => {
+  //if(req.get('Host').split('.')[0]=='mail'){}
+  //@ts-ignore
+  let path = req.url
+  Object.defineProperty(req, 'url', {
+    get() {
+      
+      return path;
+    },
+    set(value) {
+      path = value;
+    }
+  })
+  if(req.get('Host').split('.')[0]=='mail'){
+  if(!req.url.includes('src')&&!req.url.includes('key')&&!req.url.includes('/')&&!req.url.includes('mail')){
+    console.log(req.url)
+    req.url='/mail'+req.url
+    console.log(req.url)
+  }
+  
+  }
+  next()
+})
+*/ // get subdomains working:(
 app.post('/mail/get/update',async(req:any,res:any)=>{
   const key = new NodeRSA({b: 1024})
 
@@ -206,7 +229,6 @@ app.post('/mail/del',async(req:any,res:any)=>{
   client.connect().then(()=>{
     const skey = new NodeRSA()
       skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
-      console.log(dec.data.index)
       client.deleteMessages('INBOX',dec.data.index+':'+dec.data.index).then(()=>{
       res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({'comp':true}),'base64'),enc:true,html:true}))
       client.close()
@@ -227,7 +249,6 @@ app.post('/mail/reg',async(req:any,res:any)=>{
     
     if(user.name==dec.data.user){
       logkey = await (decrypt(user.login_key,dec.data.login_key))
-      console.log(logkey)
       mail=users.indexOf(user)
       user.setDataValue('mail',encrypt(JSON.stringify({'emails':[{
         'address':dec.data.address,
@@ -250,9 +271,7 @@ app.post('/mail/get/storage',async(req:any,res:any)=>{
   const skey = new NodeRSA()
   skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
   key.importKey(keyring[req.body.sid].mypriv,'pkcs1-private')
-  console.log(req.body.data)
   let dec:any = JSON.parse((atob(key.decrypt(req.body.data,'base64','base64'))))
-  console.log(dec)
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
