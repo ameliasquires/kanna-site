@@ -63,6 +63,7 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] write md emails, send as html
   - [ ] sexify
   - [ ] make mail prettier
+  - [ ] dont accept old login keys
   - [ ] add functionality
     - [x] loading screen
     - [x] storage for quicker (initial)loading
@@ -77,8 +78,10 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] extra pages
     - [x] 404 page
   - [ ] sub domains
+    - [ ] ughh hate sub domains
   - [ ] make my own libs
     - [ ] encryption (md5 hashing, and rsa)
   - [ ] add aliases that are used in cookies and randomly gen.
+    - [ ] also server side hash to check/verify the alias  
 
 FeMail (iron mail)

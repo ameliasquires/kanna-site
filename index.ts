@@ -51,6 +51,7 @@ const sequelize = new Sequelize({
 });
   let User=sequelize.define('user',{
     "html":DataTypes.BOOLEAN,
+    "test":DataTypes.TEXT,
     "name":DataTypes.TEXT,
     "hash":DataTypes.TEXT,
     "sudo":DataTypes.BOOLEAN,
@@ -59,13 +60,12 @@ const sequelize = new Sequelize({
     "login_key":DataTypes.TEXT,
     "mail":DataTypes.TEXT
 })
-
-//User.sync({ force: true })
-User.sync({ alter: true }).then(()=>{
-  //User.create(
-    //{"html":false,"name":"root","hash":"OTVYg/fHYeVbtyrusPl8fV+zQcp1ImjzbP+3Cy+3lk14fl2icYhzlULKtbTpOx4E","sudo":true,"last_login":"","alias":"root","login_key":"Pqx5y5fKHNu7APUOt1t1n+zUGwWos+iLpxH2Z/LzFKw57l/GPy3GSN/WK1iXDKcm"
-    //"mail":"hash here"}
-    //)
+sequelize.authenticate()
+User.sync({force:true}).then(()=>{
+  User.create(
+    {"html":false,"name":"root","hash":"OTVYg/fHYeVbtyrusPl8fV+zQcp1ImjzbP+3Cy+3lk14fl2icYhzlULKtbTpOx4E","sudo":true,"last_login":"","alias":"root","login_key":""
+    ,"mail":""}
+    )
 })
 const IV = "5183666c72eec9e4"; //!increase size eventually
 var encrypt = ((val:any,ENC_KEY:any) => {
@@ -80,6 +80,7 @@ var decrypt = ((encrypted:any,ENC_KEY:any) => {
   let decrypted = decipher.update(encrypted, 'base64', 'utf8');
   return (decrypted + decipher.final('utf8'));
   } catch(err){
+    console.log(err)
     return false;
   }
 });
@@ -143,7 +144,15 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
     //console.log(user,dec)
     if(user.name==dec.data.user){
       logkey = (decrypt(user.login_key,dec.data.login_key))
-      mail =JSON.parse(decrypt(user.mail,logkey)).emails[parseInt(dec.data.requested)]
+      console.log(logkey)
+      let m = decrypt(user.mail,logkey)
+      if(m==false){
+        mail=''
+      } else {
+        mail =JSON.parse(decrypt(user.mail,logkey)).emails[parseInt(dec.data.requested)] 
+      }
+      break
+      
     }
   }
   if(mail==''){
@@ -246,9 +255,11 @@ app.post('/mail/reg',async(req:any,res:any)=>{
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
-    
     if(user.name==dec.data.user){
-      logkey = await (decrypt(user.login_key,dec.data.login_key))
+      console.log(dec.login_key)
+      logkey = await (decrypt(user.login_key,dec.login_key))
+      console.log(user.login_key)
+      console.log(logkey)
       mail=users.indexOf(user)
       user.setDataValue('mail',encrypt(JSON.stringify({'emails':[{
         'address':dec.data.address,
@@ -258,7 +269,8 @@ app.post('/mail/reg',async(req:any,res:any)=>{
         'salt':crypt.randomBytes(64).toString('hex')
       }]}),logkey))
       user.save()
-      User.sync({ alter: true })
+      User.sync()
+      break
     }
   }
 })
@@ -277,7 +289,13 @@ app.post('/mail/get/storage',async(req:any,res:any)=>{
   for(let user of users){
     if(user.name==dec.data.user){
       logkey = (decrypt(user.login_key,dec.data.login_key))
-      mail =JSON.parse(decrypt(user.mail,logkey))
+      let m = JSON.parse(decrypt(user.mail,logkey)).emails
+      if(m==undefined){
+        mail=''
+      } else {
+        mail =JSON.parse(decrypt(user.mail,logkey))
+      }
+      
     }
   }
   if(mail==''){
@@ -353,7 +371,7 @@ app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string
       
       user.setDataValue('login_key',encrypt(hash,logkey))
       user.save()
-      User.sync({ alter: true })
+      User.sync({ alter:true })
       break
     }
   }
