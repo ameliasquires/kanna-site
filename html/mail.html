@@ -398,7 +398,7 @@
             revved = emails.reverse()
             index = revved.indexOf(emails[index]) + 1
             //pretty proud of this reverse indexer :)
-            sendenc('/del', { 'index': index, 'fuck you': true, 'user': 'root', 'login_key': getCookie('login_key'), 'requested': 0 }).then(()=>{
+            sendenc('/del', { 'index': index, 'fuck you': true, 'user': 'root', 'login_key': getCookie('login_key'), 'requested': 0 }).then(() => {
                 update()
             })
         }

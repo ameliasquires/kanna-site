@@ -61,12 +61,15 @@ const sequelize = new Sequelize({
     "mail":DataTypes.TEXT
 })
 sequelize.authenticate()
+/*
 User.sync({force:true}).then(()=>{
   User.create(
     {"html":false,"name":"root","hash":"OTVYg/fHYeVbtyrusPl8fV+zQcp1ImjzbP+3Cy+3lk14fl2icYhzlULKtbTpOx4E","sudo":true,"last_login":"","alias":"root","login_key":""
     ,"mail":""}
-    )
-})
+    ).then((i:any)=>{
+      i.save()
+    })
+})*/
 const IV = "5183666c72eec9e4"; //!increase size eventually
 var encrypt = ((val:any,ENC_KEY:any) => {
   let cipher = crypt.createCipheriv('aes-256-cbc', ENC_KEY, IV);

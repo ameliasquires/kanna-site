@@ -45,6 +45,7 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
 - [ ] add extra pages
   - [ ] home page (quick links, etc)
   - [ ] mail
+    - [ ] allow for automation (ie, auto reply)
   - [ ] forums
   - [ ] storage
     - [ ] viewer for images
@@ -80,15 +81,16 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] sub domains
     - [ ] ughh hate sub domains
   - [ ] make my own libs
-    - [ ] encryption (md5 hashing, and rsa)
+    - [ ] encryption (md5 hashing, rsa, and aes)
   - [ ] add aliases that are used in cookies and randomly gen.
     - [ ] also server side hash to check/verify the alias  
   - [ ] more sexy gradients (everywhere)
   - [ ] lower verbosity (and options to change it)
+  - [ ] move all dependencies to local ones
 
 ### issues 
 
-  - [ ] storage not saving
+  - [x] storage not saving
   - [ ] check for login key cookie on page loads
 
 FeMail (iron mail)
