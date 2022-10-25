@@ -83,5 +83,12 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
     - [ ] encryption (md5 hashing, and rsa)
   - [ ] add aliases that are used in cookies and randomly gen.
     - [ ] also server side hash to check/verify the alias  
+  - [ ] more sexy gradients (everywhere)
+  - [ ] lower verbosity (and options to change it)
+
+### issues 
+
+  - [ ] storage not saving
+  - [ ] check for login key cookie on page loads
 
 FeMail (iron mail)
