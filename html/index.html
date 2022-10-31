@@ -134,7 +134,8 @@
                         //console.log(JSON.parse(decc))
                         let u = await document.getElementById('user').value
                         await setCookie('login_key', JSON.parse(decc).login_key, 7)
-                        await setCookie('user', u, 7)
+                        await setCookie('user', JSON.parse(decc).alias, 7)
+                        //await setCookie('user', u, 7)
                         location.href = location.href + 'home'
                     }
                 }

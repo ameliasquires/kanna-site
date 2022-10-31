@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 const NodeRSA = require('node-rsa');
 var ip = require("ip")
 var crypt = require('crypto');
+app.use('/favicon.ico', express.static('/src/favicon.ico'))
 Object.defineProperty(global, '__stack', {
   get: function() {
           var orig = Error.prepareStackTrace;
@@ -145,7 +146,7 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
   let logkey:any,mail:any
   for(let user of users){
     //console.log(user,dec)
-    if(user.name==dec.data.user){
+    if(user.alias==dec.data.user){
       logkey = (decrypt(user.login_key,dec.data.login_key))
       console.log(logkey)
       let m = decrypt(user.mail,logkey)
@@ -173,12 +174,13 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
     },logLevel:1000
   });
   client.connect().then(()=>{
+    console.log('connected')
     //['uid', 'flags','envelope'] for just header stuff
     //['uid', 'flags','envelope','body']
     //body 0 is plani, 1 is plain
     let bo="body[0]"
     for(let user of users){
-      if(user.name==dec.data.user){
+      if(user.alias==dec.data.user){
         if(user.html){
           bo="body[2]"
         }
@@ -190,13 +192,13 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
       let mail;
       skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
       for(let user of users){
-        if(user.name==dec.data.user){
+        console.log(user)
+        if(user.alias==dec.data.user){
           mail = JSON.parse(decrypt(user.mail,logkey))
           mail.emails[parseInt(dec.data.requested)].storage = messages
           user.setDataValue('mail',encrypt(JSON.stringify(mail),logkey))
           user.save()
           User.sync({ alter: true })
-
           break
         }
       }
@@ -204,6 +206,7 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
       client.close()
   }).catch((err:any)=>{
     //! if no messages
+    console.log('none',err)
     const skey = new NodeRSA()
   skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
   res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:[],bod:bo}),'base64'),enc:true,html:true}))
@@ -258,7 +261,7 @@ app.post('/mail/reg',async(req:any,res:any)=>{
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
-    if(user.name==dec.data.user){
+    if(user.alias==dec.data.user){
       console.log(dec.login_key)
       logkey = await (decrypt(user.login_key,dec.login_key))
       console.log(user.login_key)
@@ -290,7 +293,7 @@ app.post('/mail/get/storage',async(req:any,res:any)=>{
   const users:any = await User.findAll();
   let logkey:any,mail:any
   for(let user of users){
-    if(user.name==dec.data.user){
+    if(user.alias==dec.data.user){
       logkey = (decrypt(user.login_key,dec.data.login_key))
       let m = JSON.parse(decrypt(user.mail,logkey)).emails
       if(m==undefined){
@@ -370,9 +373,11 @@ app.post('/login/submit', async (req:{body:{json:boolean,enc:boolean,data:string
       const skey = new NodeRSA()
       skey.importKey(keyring[req.body.sid].theirpub,'pkcs8-public')
       let logkey = crypt.createHash('md5').update(crypt.randomBytes(64).toString('hex')).digest('hex')
-      res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({login_key:logkey}),'base64'),enc:true,html:false,json:true,type:'key'}))
+      let alias = crypt.createHash('md5').update(crypt.randomBytes(4096).toString('hex')).digest('hex')
+      res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({login_key:logkey,alias:alias}),'base64'),enc:true,html:false,json:true,type:'key'}))
       
       user.setDataValue('login_key',encrypt(hash,logkey))
+      user.setDataValue('alias',alias)
       user.save()
       User.sync({ alter:true })
       break

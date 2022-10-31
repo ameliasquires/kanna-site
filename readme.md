@@ -16,29 +16,34 @@ create generic keys `openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout
 
 ### running
 
-#### windows
-
 dependencies:
 
-- [ ] ts-node |`npm i -g ts-node`
+- ts-node |`npm i -g ts-node`
+- package.json | `npm i`
+- development (optional)
+  - nodemon | `npm i -g nodemon`
 
-run `npm i` & `npm start`
+
+#### windows
+
+main build : `npm start`
+
+dev : `npm run dev`
 
 ---
 
 #### \*nix
 
-dependencies:
+###### please note, for linux you will need to run this as root (for permission to use these ports, 80,443)
 
-- [ ] ts-node |`sudo npm i -g ts-node`
+main build : `sudo ts-node .`
 
-run `npm i` & `sudo ts-node .`
+dev : `sudo nodemon .`
+
 
 ---
 
-<sub>kanna was here</sub>
-
-visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [github](https://github.com/squiresgrant/kanna-site)
+[gitea](https://git.disroot.org/grantsquires/kanna-site) | [github](https://github.com/squiresgrant/kanna-site)
 
 ## todo
 
@@ -63,6 +68,7 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] option to markdownify email
   - [ ] write md emails, send as html
   - [ ] sexify
+  - [ ] settings.json
   - [ ] make mail prettier
   - [ ] dont accept old login keys
   - [ ] add functionality
@@ -76,7 +82,7 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
     - [ ] sender info
   - [ ] allow for email account adding
   - [ ] docs
-  - [ ] extra pages
+  - [x] extra pages
     - [x] 404 page
   - [ ] sub domains
     - [ ] ughh hate sub domains
@@ -87,10 +93,11 @@ visit the [main git](https://git.disroot.org/grantsquires/kanna-site) or the [gi
   - [ ] more sexy gradients (everywhere)
   - [ ] lower verbosity (and options to change it)
   - [ ] move all dependencies to local ones
+  - [ ] check for permissions on what ports to open
 
 ### issues 
 
   - [x] storage not saving
-  - [ ] check for login key cookie on page loads
+  - [ ] check for login key cookie on page load
 
 FeMail (iron mail)

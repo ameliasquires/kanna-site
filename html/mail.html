@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -14,8 +15,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2&display=swap" rel="stylesheet">
     <style>
         .split {
-            height: 90%;
+            height: 91%;
             width: 51%;
+            top: 6%;
             position: fixed;
             z-index: 1;
             top: 0;
@@ -214,8 +216,8 @@
 
             float: right;
             display: inline;
-            width: 20px;
-            height: 20px;
+            width: 25px;
+            height: 25px;
         }
 
         .trashcan .trashcan-open {
@@ -228,6 +230,11 @@
 
         .trashcan:hover .trashcan-closed {
             display: none;
+        }
+
+        #emails {
+            top: 6%;
+            position: absolute;
         }
     </style>
 </head>
@@ -321,7 +328,7 @@
         function update() {
             //console.log('hi')
             let promie = new Promise((resolve, reject) => {
-                sendenc('/get/update', { 'user': 'root', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
+                sendenc('/get/update', { 'user': getCookie('user'), 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
                     res = JSON.parse(res)
                     console.log('parsed')
                     if (res.messages == 'reg') {
@@ -359,7 +366,7 @@
         function init() {
             //console.log('hi')
             let promie = new Promise((resolve, reject) => {
-                sendenc('/get/storage', { 'user': 'root', 'pass': 'password', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
+                sendenc('/get/storage', { 'user': getCookie('user'), 'pass': 'password', 'requested': 0, 'login_key': getCookie('login_key') }).then(res => {
                     res = JSON.parse(res)
                     console.log('parsed')
                     emails = res.reverse()
@@ -414,44 +421,12 @@
                 evo = !evo
                 ret += '<div onclick="lm(' + emails.indexOf(email) + ')" style="height:10%;white-space: pre-wrap;color:#A5C9CA;border-radius:5px;max-width:40%;min-width:400px;padding:20px;background-color:' + c + ';">'
 
-                ret += '<svg onclick="del(' + emails.indexOf(email) + ')"  fill="#8b0000" class="trashcan" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 25 24.8" style="enable-background:new 0 0 25 24.8;" xml:space="preserve" class="icon-trashcan ct-delete" data-ember-action="" data-ember-action-1015="1015">\
-  <g class="trashcan-open">\
-    <path d="M18.7,24.4H5.9L4.9,7h14.9L18.7,24.4z M7.6,22.6H17l0.8-13.7h-11L7.6,22.6z"></path>\
-    <polygon points="13.6,10.3 13.1,21.2 14.9,21.2 15.4,10.3 "></polygon>\
-    <polygon points="11.5,21.2 11,10.3 9.2,10.3 9.7,21.2 "></polygon>\
-    <path d="M19.1,0.7l-4.7,0.9l-0.8-1.4L8.2,1.3L8,3l-4.7,1l0.2,4.7l17.3-3.5L19.1,0.7z \
-             \
-             M8.8,1.9l4.4 -1.0 l0.5,0.8\
-             L8.7,2.8z \
-             \
-             M5.2,6.4l0-1L18,2.8l0.3,0.9L5.2,6.4z"></path>\
-  </g>\
-  <g class="trashcan-closed">\
-    <path d="M6.8,8.8h11L17,22.6\
-             H7.6L6.8,8.8z \
-             M4.9,7l1,17.4h12.8\
-             l1-17.4\
-             H4.9z"></path>\
-    <polygon points="13.6,10.3 13.1,21.2 14.9,21.2 15.4,10.3 "></polygon>\
-    <polygon points="11.5,21.2 11,10.3 9.2,10.3 9.7,21.2 "></polygon>\
-    <path d="M20.4,4h-4.8l-0.5-1.6\
-             H9.5L9,4\
-             H4.2\
-             L3.5,8.6h17.6\
-             L20.4,4z \
-             \
-             M9.9,3.2h4.8\
-             L14.9,3.9h-5.2z\
-             \
-             M5.6,6.7l0.2-1 h13l0.2,1\
-             H5.6z"></path>\
-  </g>\
-</svg>'
+                ret += '<svg onclick="del(' + emails.indexOf(email) + ')"  fill="#8b0000" class="trashcan" viewBox="0 0 24 24"><path d="M18,6h0a1,1,0,0,0-1.414,0L12,10.586,7.414,6A1,1,0,0,0,6,6H6A1,1,0,0,0,6,7.414L10.586,12,6,16.586A1,1,0,0,0,6,18H6a1,1,0,0,0,1.414,0L12,13.414,16.586,18A1,1,0,0,0,18,18h0a1,1,0,0,0,0-1.414L13.414,12,18,7.414A1,1,0,0,0,18,6Z"/></svg>'
 
                 ret += '<tt><b><font size="4">sub:' + email.envelope.subject + '</font></b></br>frm:' + email.envelope.from[0].address + '</br><sub style="color:#E7F6F2;">' + email.envelope.date + '</sub></tt></br></div><div style="height:2px;"></div>'
             }
 
-            document.getElementById('emails').innerHTML = ret
+            document.getElementById('emails').innerHTML = ret + ret + ret + ret + ret + ret + ret
         }
         async function load() {
 
@@ -469,11 +444,12 @@
             let xx = document.getElementsByClassName('card')[0]
             let xy = xx.style.top
             let x = setInterval(() => {
-                if (xy >= 100) {
+                if (xy <= -100) {
+                    document.getElementsByClassName('card')[0].style.display = 'none'
                     clearInterval(x)
                 }
                 document.getElementsByClassName('card')[0].style.top = xy + '%'
-                xy -= 15
+                xy -= 5
 
             }, 10)
 

@@ -26,6 +26,7 @@
     "md5": "^2.3.0",
     "node-rsa": "^1.1.1",
     "openpgp": "^5.5.0",
+    "serve-favicon": "^2.5.0",
     "utf8": "^3.0.0"
   },
   "devDependencies": {
