@@ -84,7 +84,6 @@ var decrypt = ((encrypted:any,ENC_KEY:any) => {
   let decrypted = decipher.update(encrypted, 'base64', 'utf8');
   return (decrypted + decipher.final('utf8'));
   } catch(err){
-    console.log(err)
     return false;
   }
 });
@@ -137,6 +136,7 @@ app.use((req:any, res:any, next:any) => {
   next()
 })
 */ // get subdomains working:(
+
 app.post('/mail/get/update',async(req:any,res:any)=>{
   const key = new NodeRSA({b: 1024})
 
@@ -166,14 +166,15 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
     res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:'reg'}),'base64'),enc:true,html:true}))
     return  
   }
+  console.log(mail.host)
+  /*
   var client = new ImapClient(mail.host, parseInt(mail.port), {
     auth: {
         user: mail.address,
         pass: mail.creds,
         
-    },logLevel:1000
-  });
-  client.connect().then(()=>{
+    }
+  }).connect().then(()=>{
     console.log('connected')
     //['uid', 'flags','envelope'] for just header stuff
     //['uid', 'flags','envelope','body']
@@ -218,7 +219,10 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
   res.send(JSON.stringify({data:skey.encrypt(JSON.stringify({messages:[],bod:bo}),'base64'),enc:true,html:true}))
   client.close()
 }
+  }).catch((err:any)=>{
+    console.log(err)
   })
+  //deprecated:(*/
 })
 app.post('/mail/del',async(req:any,res:any)=>{
   const key = new NodeRSA({b: 1024})
@@ -264,8 +268,6 @@ app.post('/mail/reg',async(req:any,res:any)=>{
     if(user.alias==dec.data.user){
       console.log(dec.login_key)
       logkey = await (decrypt(user.login_key,dec.login_key))
-      console.log(user.login_key)
-      console.log(logkey)
       mail=users.indexOf(user)
       user.setDataValue('mail',encrypt(JSON.stringify({'emails':[{
         'address':dec.data.address,
