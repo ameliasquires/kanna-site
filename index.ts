@@ -167,14 +167,15 @@ app.post('/mail/get/update',async(req:any,res:any)=>{
     return  
   }
   console.log(mail.host)
-  /*
+  
   var client = new ImapClient(mail.host, parseInt(mail.port), {
     auth: {
         user: mail.address,
         pass: mail.creds,
         
     }
-  }).connect().then(()=>{
+  })
+  client.connect().then(()=>{
     console.log('connected')
     //['uid', 'flags','envelope'] for just header stuff
     //['uid', 'flags','envelope','body']
